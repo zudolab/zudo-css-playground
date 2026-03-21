@@ -42,13 +42,14 @@ The dev server starts at `http://localhost:4321`.
 
 ### Available Scripts
 
-| Script | Description |
-|---|---|
-| `pnpm dev` | Start dev server on localhost:4321 |
+| Script         | Description                                  |
+| -------------- | -------------------------------------------- |
+| `pnpm dev`     | Start dev server on localhost:4321           |
 | `pnpm dev:net` | Start dev server on 0.0.0.0 (LAN accessible) |
-| `pnpm build` | Production build |
-| `pnpm preview` | Preview the production build |
-| `pnpm preview:net` | Preview on LAN |
+| `pnpm build`   | Production build                             |
+| `pnpm preview` | Preview the production build                 |
+| `pnpm check`   | TypeScript check                             |
+| `pnpm b4push`  | Run all checks before pushing                |
 
 Port cleanup happens automatically via pre-hooks — any stale process on port 4321 is killed before each dev/preview start.
 

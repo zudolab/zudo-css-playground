@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react';
-import useBaseUrl from '@docusaurus/useBaseUrl';
-import categoryNav from '@site/src/data/category-nav.json';
-import styles from './styles.module.css';
+import type { ReactNode } from "react";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+import categoryNav from "@site/src/data/category-nav.json";
+import styles from "./styles.module.css";
 
 type CategoryKey = keyof typeof categoryNav;
 
@@ -35,7 +35,7 @@ interface CategoryNavProps {
  */
 export default function CategoryNav({ category }: CategoryNavProps): ReactNode {
   // Get the base URL for docs
-  const docsBaseUrl = useBaseUrl('/docs/');
+  const docsBaseUrl = useBaseUrl("/");
 
   const data = categoryNav[category] as CategoryData;
 
