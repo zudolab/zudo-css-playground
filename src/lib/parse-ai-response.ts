@@ -1,58 +1,60 @@
-import { validateAstroFilename } from "./validate-astro-filename";
+import { isValidAstroFilename } from "./validate-astro-filename";
 
-export interface ParsedChatResponse {
-  action: "chat";
+export interface ParsedAiResponse {
+  action: "pending_files" | "chat";
   message: string;
+  files?: Record<string, string>;
+  sidebarEntry?: { slug: string; label: string; count: number };
 }
 
-export interface ParsedPendingFilesResponse {
-  action: "pending_files";
-  pendingFiles: Record<string, string>;
-  sidebarEntry: { slug: string; label: string; count: number } | null;
-  files: string[];
-  message: string;
-  needsReload: true;
-}
-
-export type ParsedAiResponse = ParsedChatResponse | ParsedPendingFilesResponse;
-
+/**
+ * Parses the raw AI response string into a structured response.
+ * Handles JSON with optional markdown code fences, and plain text fallback.
+ */
 export function parseAiResponse(rawResponse: string): ParsedAiResponse {
   let parsed: Record<string, unknown>;
   try {
+    // Strip markdown code fences if AI wrapped it
     const cleaned = rawResponse
-      .replace(/^```(?:json)?\n?/i, "")
+      .replace(/^```json?\n?/i, "")
       .replace(/\n?```$/i, "")
       .trim();
     parsed = JSON.parse(cleaned);
   } catch {
+    // AI responded with plain text — return as chat message
     return { action: "chat", message: rawResponse };
   }
 
   if (parsed.action === "create_patterns" && parsed.files) {
-    const files = parsed.files as Record<string, string>;
+    const rawFiles = parsed.files as Record<string, string>;
     const validFiles: Record<string, string> = {};
 
-    for (const [filename, content] of Object.entries(files)) {
-      if (validateAstroFilename(filename)) {
+    for (const [filename, content] of Object.entries(rawFiles)) {
+      if (isValidAstroFilename(filename)) {
         validFiles[filename] = content;
       }
     }
 
-    const fileNames = Object.keys(validFiles);
+    if (Object.keys(validFiles).length === 0) {
+      return {
+        action: "chat",
+        message: (parsed.message as string) || "No valid files in AI response.",
+      };
+    }
+
     return {
       action: "pending_files",
-      pendingFiles: validFiles,
-      sidebarEntry:
-        (parsed.sidebarEntry as ParsedPendingFilesResponse["sidebarEntry"]) ||
-        null,
-      files: fileNames,
       message:
         (parsed.message as string) ||
-        `Created ${fileNames.join(", ")}. Click reload to apply.`,
-      needsReload: true,
+        `Created ${Object.keys(validFiles).join(", ")}.`,
+      files: validFiles,
+      sidebarEntry: parsed.sidebarEntry as
+        | { slug: string; label: string; count: number }
+        | undefined,
     };
   }
 
+  // Regular chat response
   return {
     action: "chat",
     message: (parsed.message as string) || rawResponse,

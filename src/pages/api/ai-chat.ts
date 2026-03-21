@@ -2,9 +2,10 @@ export const prerender = false;
 
 import type { APIRoute } from "astro";
 import { spawn } from "node:child_process";
-import { writeFileSync, readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseAiResponse } from "../../lib/parse-ai-response";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 // In dev: src/pages/api/ → ../../ = src/
@@ -168,64 +169,21 @@ export const POST: APIRoute = async ({ request }) => {
   inFlight = true;
   try {
     const rawResponse = await callClaude(fullPrompt);
+    const result = parseAiResponse(rawResponse);
 
-    // Try to parse as JSON action
-    let parsed: Record<string, unknown>;
-    try {
-      // Strip markdown code fences if AI wrapped it
-      const cleaned = rawResponse
-        .replace(/^```json?\n?/i, "")
-        .replace(/\n?```$/i, "")
-        .trim();
-      parsed = JSON.parse(cleaned);
-    } catch {
-      // AI responded with plain text — return as chat message
-      return jsonResponse({ action: "chat", message: rawResponse });
-    }
-
-    if (parsed.action === "create_patterns" && parsed.files) {
-      // Write files to disk
-      const files = parsed.files as Record<string, string>;
-      const writtenFiles: string[] = [];
-
-      for (const [filename, content] of Object.entries(files)) {
-        // Safety: only allow .astro files in pages dir
-        if (
-          !filename.endsWith(".astro") ||
-          filename.includes("..") ||
-          filename.includes("/")
-        ) {
-          continue;
-        }
-        const filePath = join(PAGES_DIR, filename);
-        writeFileSync(filePath, content, "utf-8");
-        writtenFiles.push(filename);
-      }
-
-      // Update sidebar-nav.tsx if sidebarEntry provided
-      if (parsed.sidebarEntry && writtenFiles.length > 0) {
-        const entry = parsed.sidebarEntry as {
-          slug: string;
-          label: string;
-          count: number;
-        };
-        updateSidebarNav(entry);
-      }
-
+    if (result.action === "pending_files") {
       return jsonResponse({
-        action: "files_written",
-        files: writtenFiles,
-        message:
-          (parsed.message as string) ||
-          `Created ${writtenFiles.join(", ")}. Reload to see changes.`,
+        action: "pending_files",
+        files: result.files,
+        sidebarEntry: result.sidebarEntry,
+        message: result.message,
         needsReload: true,
       });
     }
 
-    // Regular chat response
     return jsonResponse({
       action: "chat",
-      message: (parsed.message as string) || rawResponse,
+      message: result.message,
     });
   } catch (err) {
     return jsonResponse(
@@ -236,32 +194,6 @@ export const POST: APIRoute = async ({ request }) => {
     inFlight = false;
   }
 };
-
-function updateSidebarNav(entry: {
-  slug: string;
-  label: string;
-  count: number;
-}) {
-  const navPath = join(PROJECT_ROOT, "src", "components", "sidebar-nav.tsx");
-  if (!existsSync(navPath)) return;
-
-  let content = readFileSync(navPath, "utf-8");
-
-  // Check if category already exists
-  if (content.includes(`slug: "${entry.slug}"`)) {
-    // Update count
-    const pattern = new RegExp(
-      `(\\{ slug: "${entry.slug}", label: "${entry.label}", count: )\\d+`,
-    );
-    content = content.replace(pattern, `$1${entry.count}`);
-  } else {
-    // Add new entry before the closing bracket
-    const newEntry = `  { slug: "${entry.slug}", label: "${entry.label}", count: ${entry.count} },\n`;
-    content = content.replace(/^(\];)/m, `${newEntry}$1`);
-  }
-
-  writeFileSync(navPath, content, "utf-8");
-}
 
 async function callClaude(prompt: string): Promise<string> {
   return new Promise((resolve, reject) => {
