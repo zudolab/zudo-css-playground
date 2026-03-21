@@ -2,6 +2,7 @@
 import "../styles/tokens.css";
 import SidebarNav from "../components/sidebar-nav.tsx";
 import ColorTweakPanel from "../components/color-tweak-panel.tsx";
+import DemoTweakPanel from "../components/demo-tweak-panel.tsx";
 import AiChatModal from "../components/ai-chat-modal.tsx";
 
 interface Props {
@@ -42,6 +43,7 @@ const { title, activeCategory } = Astro.props;
       </main>
     </div>
     <ColorTweakPanel client:load />
+    <DemoTweakPanel client:load />
     <AiChatModal client:load />
   </body>
 </html>
