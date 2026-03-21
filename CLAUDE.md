@@ -2,6 +2,19 @@
 
 AI-driven CSS Playground app for generating and previewing UI component variations with strict design token enforcement.
 
+## Project Structure
+
+```
+zudo-css-playground/
+├── src/                    # Main Astro playground app
+├── doc/                    # Documentation site (Docusaurus, separate package)
+├── src-tauri/              # Tauri v2 desktop wrapper
+├── frontend/               # Tauri loading screen
+├── scripts/                # Build scripts
+├── .github/workflows/      # CI/CD
+└── .husky/                 # Git hooks
+```
+
 ## Tech Stack
 
 - **Astro 5** — Static/hybrid SSR (with @astrojs/node for API routes)
@@ -20,6 +33,15 @@ pnpm dev              # Dev server → http://localhost:4321
 pnpm dev:net          # Dev server on LAN (0.0.0.0)
 pnpm build            # Production build
 pnpm preview          # Preview production build
+pnpm check            # TypeScript check
+pnpm b4push           # Run all checks before pushing
+```
+
+### Doc Sub-package
+
+```bash
+pnpm doc:dev          # Doc dev server
+pnpm doc:build        # Doc production build
 ```
 
 ## Architecture
@@ -34,12 +56,12 @@ Three-tier color + tight spacing tokens. All pattern CSS must use token variable
 
 ### Components
 
-| Component | Purpose |
-|-----------|---------|
-| `html-preview.tsx` | Iframe-based live CSS demos with viewport switching |
-| `sidebar-nav.tsx` | Category navigation |
-| `color-tweak-panel.tsx` | Floating color palette editor (3 presets) |
-| `ai-chat-modal.tsx` | AI chat that creates pattern files via Claude CLI |
+| Component               | Purpose                                             |
+| ----------------------- | --------------------------------------------------- |
+| `html-preview.tsx`      | Iframe-based live CSS demos with viewport switching |
+| `sidebar-nav.tsx`       | Category navigation                                 |
+| `color-tweak-panel.tsx` | Floating color palette editor (3 presets)           |
+| `ai-chat-modal.tsx`     | AI chat that creates pattern files via Claude CLI   |
 
 ### AI Chat (`src/pages/api/ai-chat.ts`)
 
@@ -62,7 +84,14 @@ cargo tauri dev                 # Dev mode
 cargo tauri build               # Build .app
 ```
 
+## Quality
+
+- **Pre-commit**: lint-staged runs prettier on staged files
+- **b4push**: Sequential validation — TypeScript check → build → doc build
+- **CI**: GitHub Actions runs check + build on push/PR to main
+
 ## Safety Rules
 
 - `rm -rf`: relative paths only
 - No force push, no `--amend` unless explicitly permitted
+- Temp files go to `__inbox/` (gitignored)

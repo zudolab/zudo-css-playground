@@ -1,7 +1,28 @@
-node_modules/
+# Build
 dist/
 .astro/
+build/
+
+# Dependencies
+node_modules/
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+# Misc
+__inbox/
+worktrees/
 
 # Tauri
 src-tauri/target/
 src-tauri/binaries/
+
+# Doc
+doc/node_modules/
+doc/build/
+doc/.docusaurus/
+doc/src/data/

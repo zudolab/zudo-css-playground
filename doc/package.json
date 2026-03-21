@@ -1,0 +1,50 @@
+{
+  "name": "doc",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "docusaurus": "docusaurus",
+    "generate-doc-titles": "node scripts/generate-doc-titles.js",
+    "generate-category-nav": "node scripts/generate-category-nav.js",
+    "generate": "pnpm run generate-doc-titles && pnpm run generate-category-nav",
+    "start": "docusaurus start --port 44821 --host css-playground.localhost",
+    "build": "pnpm run generate && docusaurus build",
+    "swizzle": "docusaurus swizzle",
+    "clear": "docusaurus clear",
+    "serve": "docusaurus serve",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@docusaurus/core": "3.9.2",
+    "@docusaurus/plugin-content-docs": "3.9.2",
+    "@docusaurus/preset-classic": "3.9.2",
+    "@docusaurus/theme-common": "3.9.2",
+    "@docusaurus/theme-mermaid": "3.9.2",
+    "@mdx-js/react": "^3.1.1",
+    "clsx": "^2.1.1",
+    "prism-react-renderer": "^2.4.1",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  },
+  "devDependencies": {
+    "@docusaurus/module-type-aliases": "3.9.2",
+    "@docusaurus/types": "3.9.2",
+    "gray-matter": "^4.0.3",
+    "typescript": "^5.9.3"
+  },
+  "browserslist": {
+    "production": [
+      ">0.5%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 3 chrome version",
+      "last 3 firefox version",
+      "last 5 safari version"
+    ]
+  },
+  "engines": {
+    "node": ">=20.0"
+  }
+}
