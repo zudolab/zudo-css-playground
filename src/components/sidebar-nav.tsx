@@ -1,13 +1,4 @@
-const categories = [
-  { slug: "headers", label: "Headers", count: 8 },
-  { slug: "cards", label: "Cards", count: 8 },
-  { slug: "forms", label: "Forms", count: 6 },
-  { slug: "tabs", label: "Tabs", count: 6 },
-  { slug: "toasts", label: "Toasts", count: 4 },
-  { slug: "footers", label: "Footers", count: 4 },
-  { slug: "buttons", label: "Buttons", count: 10 },
-  { slug: "dialogs", label: "Dialogs", count: 3 },
-];
+const categories: { slug: string; label: string; count: number }[] = [];
 
 interface Props {
   activeCategory?: string;

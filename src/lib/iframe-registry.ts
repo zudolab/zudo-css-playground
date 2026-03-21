@@ -1,5 +1,34 @@
-const iframes = new Set<HTMLIFrameElement>();
-let currentOverrides: Record<string, string> = {};
+/**
+ * Iframe registry for live demo token updates.
+ *
+ * Uses direct DOM queries (document.querySelectorAll("iframe")) to find
+ * all iframes on the page. This avoids issues with Astro's client:visible
+ * directive where iframes exist in the DOM but their React components
+ * haven't hydrated yet (so registerIframe was never called).
+ *
+ * Overrides are stored on `window` so all Astro island bundles share state.
+ */
+
+const OVERRIDES_KEY = "__demoTokenOverrides";
+
+function getOverrides(): Record<string, string> {
+  const w = globalThis as unknown as Record<string, Record<string, string>>;
+  if (!w[OVERRIDES_KEY]) {
+    w[OVERRIDES_KEY] = {};
+  }
+  return w[OVERRIDES_KEY];
+}
+
+function setOverridesStore(overrides: Record<string, string>): void {
+  (globalThis as unknown as Record<string, Record<string, string>>)[
+    OVERRIDES_KEY
+  ] = overrides;
+}
+
+function getAllIframes(): HTMLIFrameElement[] {
+  if (typeof document === "undefined") return [];
+  return Array.from(document.querySelectorAll("iframe"));
+}
 
 function applyOverridesToIframe(
   iframe: HTMLIFrameElement,
@@ -16,34 +45,38 @@ function applyOverridesToIframe(
   }
 }
 
+/** Called by HtmlPreview on load — applies current overrides to newly loaded iframe */
 export function registerIframe(el: HTMLIFrameElement): void {
-  iframes.add(el);
-  if (Object.keys(currentOverrides).length > 0) {
-    applyOverridesToIframe(el, currentOverrides);
+  const overrides = getOverrides();
+  if (Object.keys(overrides).length > 0) {
+    applyOverridesToIframe(el, overrides);
   }
 }
 
-export function unregisterIframe(el: HTMLIFrameElement): void {
-  iframes.delete(el);
+/** No-op kept for API compatibility */
+export function unregisterIframe(_el: HTMLIFrameElement): void {
+  // No longer tracking a Set — using DOM queries instead
 }
 
 export function applyToAllIframes(variable: string, value: string): void {
-  for (const iframe of iframes) {
+  const overrides = getOverrides();
+  overrides[variable] = value;
+  for (const iframe of getAllIframes()) {
     applyOverridesToIframe(iframe, { [variable]: value });
   }
 }
 
 export function setGlobalOverrides(overrides: Record<string, string>): void {
-  currentOverrides = { ...overrides };
-  for (const iframe of iframes) {
-    applyOverridesToIframe(iframe, currentOverrides);
+  setOverridesStore({ ...overrides });
+  for (const iframe of getAllIframes()) {
+    applyOverridesToIframe(iframe, overrides);
   }
 }
 
 export function resetGlobalOverrides(): void {
-  const keysToRemove = Object.keys(currentOverrides);
-  currentOverrides = {};
-  for (const iframe of iframes) {
+  const keysToRemove = Object.keys(getOverrides());
+  setOverridesStore({});
+  for (const iframe of getAllIframes()) {
     try {
       const root = iframe.contentDocument?.documentElement;
       if (!root) continue;
