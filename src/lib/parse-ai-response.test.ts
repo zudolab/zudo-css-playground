@@ -1,8 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  parseAiResponse,
-  type ParsedPendingFilesResponse,
-} from "./parse-ai-response";
+import { parseAiResponse, type ParsedAiResponse } from "./parse-ai-response";
 
 describe("parseAiResponse", () => {
   describe("plain text fallback", () => {
@@ -66,14 +63,12 @@ describe("parseAiResponse", () => {
       const result = parseAiResponse(raw);
       expect(result).toEqual({
         action: "pending_files",
-        pendingFiles: {
+        files: {
           "cards.astro": "<h1>Cards</h1>",
           "tabs.astro": "<h1>Tabs</h1>",
         },
         sidebarEntry: { slug: "cards", label: "Cards", count: 5 },
-        files: ["cards.astro", "tabs.astro"],
         message: "Created patterns!",
-        needsReload: true,
       });
     });
 
@@ -88,10 +83,9 @@ describe("parseAiResponse", () => {
         },
         message: "Done",
       });
-      const result = parseAiResponse(raw) as ParsedPendingFilesResponse;
+      const result = parseAiResponse(raw);
       expect(result.action).toBe("pending_files");
-      expect(result.pendingFiles).toEqual({ "good.astro": "ok" });
-      expect(result.files).toEqual(["good.astro"]);
+      expect(result.files).toEqual({ "good.astro": "ok" });
     });
 
     it("generates a default message when none provided", () => {
@@ -100,18 +94,28 @@ describe("parseAiResponse", () => {
         files: { "footer.astro": "<footer/>" },
       });
       const result = parseAiResponse(raw);
-      expect(result.message).toBe(
-        "Created footer.astro. Click reload to apply.",
-      );
+      expect(result.message).toBe("Created footer.astro.");
     });
 
-    it("returns null sidebarEntry when not provided", () => {
+    it("returns undefined sidebarEntry when not provided", () => {
       const raw = JSON.stringify({
         action: "create_patterns",
         files: { "nav.astro": "<nav/>" },
       });
-      const result = parseAiResponse(raw) as ParsedPendingFilesResponse;
-      expect(result.sidebarEntry).toBeNull();
+      const result = parseAiResponse(raw);
+      expect(result.sidebarEntry).toBeUndefined();
+    });
+
+    it("returns chat when all files are invalid", () => {
+      const raw = JSON.stringify({
+        action: "create_patterns",
+        files: {
+          "../evil.astro": "bad",
+          "not-astro.tsx": "bad",
+        },
+      });
+      const result = parseAiResponse(raw);
+      expect(result.action).toBe("chat");
     });
   });
 });
