@@ -91,10 +91,11 @@ Click the circular gradient button in the top-right corner of the page.
 ### Features
 
 - **Preset themes**: Switch between Catppuccin Mocha (default), Dracula, and Nord
-- **Palette editing**: Adjust all 16 raw palette colors (p0–p15) via color pickers in a 4×4 grid
-- **Semantic editing**: Adjust the 10 semantic color tokens (BG, FG, Surface, Muted, Accent, Accent Hover, Success, Danger, Warning, Info)
+- **Palette editing**: Adjust all 16 raw palette colors (p0-p15) via clickable swatches in an 8x2 grid. Clicking a swatch opens an HSL picker with hue, saturation, and lightness sliders
+- **Base mapping**: Map BG and FG to palette indices using dropdown selectors
+- **Semantic token mapping**: Map all semantic tokens (Surface, Muted, Accent, etc.) to palette indices using PaletteSelector dropdowns, enforcing the palette-to-semantic relationship
 - **Drag to reposition**: Grab the title bar to move the panel anywhere on screen
-- **Persistent state**: Your color choices and panel position are saved to localStorage
+- **Persistent state**: Your color choices are saved to localStorage
 
 ### How It Works
 

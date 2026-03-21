@@ -156,8 +156,9 @@ export const POST: APIRoute = async ({ request }) => {
   const existingPages = readExistingPages();
   const sidebarCode = readSidebarCategories();
 
-  const contextLines = validHistory.map((h: ChatMessage) =>
-    `${h.role === "user" ? "User" : "Assistant"}: ${h.content}`,
+  const contextLines = validHistory.map(
+    (h: ChatMessage) =>
+      `${h.role === "user" ? "User" : "Assistant"}: ${h.content}`,
   );
   contextLines.push(
     `\n[Context]\n${existingPages}\n\nCurrent sidebar-nav.tsx:\n${sidebarCode}\n\nUser: ${message}`,
@@ -189,7 +190,11 @@ export const POST: APIRoute = async ({ request }) => {
 
       for (const [filename, content] of Object.entries(files)) {
         // Safety: only allow .astro files in pages dir
-        if (!filename.endsWith(".astro") || filename.includes("..") || filename.includes("/")) {
+        if (
+          !filename.endsWith(".astro") ||
+          filename.includes("..") ||
+          filename.includes("/")
+        ) {
           continue;
         }
         const filePath = join(PAGES_DIR, filename);
@@ -285,9 +290,9 @@ async function callClaude(prompt: string): Promise<string> {
       if (!settled) {
         settled = true;
         proc.kill();
-        reject(new Error("Timeout after 60s"));
+        reject(new Error("Timeout after 480s"));
       }
-    }, 60_000);
+    }, 480_000);
 
     proc.stdout.on("data", (d: Buffer) => {
       output += d.toString();
