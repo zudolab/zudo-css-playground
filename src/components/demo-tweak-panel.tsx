@@ -171,9 +171,8 @@ export default function DemoTweakPanel() {
   };
 
   const handleReset = () => {
-    const defaults = buildDefaults();
-    setState(defaults);
-    resetGlobalOverrides();
+    setState(buildDefaults());
+    // useEffect[state] re-applies default values to all iframes
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch {
