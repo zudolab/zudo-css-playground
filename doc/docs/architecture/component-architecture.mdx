@@ -65,10 +65,10 @@ Iframe-based live CSS demo renderer. Each pattern is displayed inside an isolate
 
 ```typescript
 interface Props {
-  html: string;       // HTML content to render
-  css: string;        // CSS styles injected into iframe
-  title?: string;     // Panel title/label
-  height?: number;    // Fixed height in px; auto-measured if omitted
+  html: string; // HTML content to render
+  css: string; // CSS styles injected into iframe
+  title?: string; // Panel title/label
+  height?: number; // Fixed height in px; auto-measured if omitted
   defaultOpen?: boolean; // Code section initially expanded (default: false)
 }
 ```
@@ -147,12 +147,12 @@ Each category links to `/{slug}` and shows the pattern count in muted text.
 
 ### Styling States
 
-| State | Classes |
-|---|---|
+| State   | Classes                                            |
+| ------- | -------------------------------------------------- |
 | Default | `text-fg hover:bg-surface hover:text-accent-hover` |
-| Active | `bg-accent/15 text-accent font-medium` |
+| Active  | `bg-accent/15 text-accent font-medium`             |
 
-The AI chat API can update this file programmatically when new categories are created (see [AI API](/docs/specs/ai-api)).
+The AI chat API can update this file programmatically when new categories are created (see [AI API](/specs/ai-api)).
 
 ## ColorTweakPanel
 
@@ -178,22 +178,22 @@ The panel has two sections:
 
 **Semantic**: 10 color input pickers in a 2-column grid:
 
-| Field | CSS Variable |
-|---|---|
-| BG | `--cssp-bg` |
-| FG | `--cssp-fg` |
-| Surface | `--cssp-surface` |
-| Muted | `--cssp-muted` |
-| Accent | `--cssp-accent` |
+| Field     | CSS Variable          |
+| --------- | --------------------- |
+| BG        | `--cssp-bg`           |
+| FG        | `--cssp-fg`           |
+| Surface   | `--cssp-surface`      |
+| Muted     | `--cssp-muted`        |
+| Accent    | `--cssp-accent`       |
 | Acc Hover | `--cssp-accent-hover` |
-| Success | `--cssp-success` |
-| Danger | `--cssp-danger` |
-| Warning | `--cssp-warning` |
-| Info | `--cssp-info` |
+| Success   | `--cssp-success`      |
+| Danger    | `--cssp-danger`       |
+| Warning   | `--cssp-warning`      |
+| Info      | `--cssp-info`         |
 
 ### Presets
 
-Three built-in presets (see [Color Architecture](/docs/specs/color-architecture) for full hex values):
+Three built-in presets (see [Color Architecture](/specs/color-architecture) for full hex values):
 
 - Catppuccin Mocha (default)
 - Dracula
@@ -205,11 +205,11 @@ Select a preset from the dropdown or click **Reset** to restore the current pres
 
 Three localStorage keys:
 
-| Key | Purpose |
-|---|---|
-| `cssp-tweak-state` | Full color state (palette + semantic) |
-| `cssp-tweak-position` | Panel x,y coordinates |
-| `cssp-tweak-preset` | Active preset name |
+| Key                   | Purpose                               |
+| --------------------- | ------------------------------------- |
+| `cssp-tweak-state`    | Full color state (palette + semantic) |
+| `cssp-tweak-position` | Panel x,y coordinates                 |
+| `cssp-tweak-preset`   | Active preset name                    |
 
 ### Live DOM Updates
 
@@ -236,8 +236,8 @@ Uses the native `<dialog>` element with `showModal()`. Features:
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
-  needsReload?: boolean;    // Show reload button
-  filesWritten?: string[];  // List of created files
+  needsReload?: boolean; // Show reload button
+  filesWritten?: string[]; // List of created files
 }
 ```
 

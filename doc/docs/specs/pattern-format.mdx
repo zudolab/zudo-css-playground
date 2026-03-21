@@ -70,7 +70,7 @@ Each HtmlPreview renders an isolated iframe with:
 2. Base styles (`body { font-family: system-ui, sans-serif; }`)
 3. Inherited form styles (`input, button, textarea, select { font-family: inherit; }`)
 4. Focus visible styles (`:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }`)
-5. The `BASE_TOKENS` — shared design token variables (see [Token System](/docs/specs/token-system#in-htmlpreview-demos--base_tokens))
+5. The `BASE_TOKENS` — shared design token variables (see [Token System](/specs/token-system#in-htmlpreview-demos--base_tokens))
 6. The pattern's custom CSS (from the `css` prop)
 7. The pattern's HTML (from the `html` prop) in the `<body>`
 
@@ -80,11 +80,11 @@ The iframe uses `sandbox="allow-same-origin"` for security. No JavaScript runs i
 
 The toolbar provides three viewport options:
 
-| Button | Width | Use Case |
-|---|---|---|
-| Mobile | 320px | Small phone screens |
-| Tablet | 768px | Tablet/small laptop |
-| Full | 100% | Full container width |
+| Button | Width | Use Case             |
+| ------ | ----- | -------------------- |
+| Mobile | 320px | Small phone screens  |
+| Tablet | 768px | Tablet/small laptop  |
+| Full   | 100%  | Full container width |
 
 ### Height
 
@@ -115,26 +115,26 @@ All CSS values must come from the BASE_TOKENS variables. No arbitrary values are
 
 /* WRONG — arbitrary values */
 .card {
-  padding: 20px;           /* Use var(--space-md) */
-  background: #ffffff;      /* Use var(--bg) */
-  border: 1px solid #ddd;   /* Use var(--border) */
-  border-radius: 8px;       /* Use var(--radius) */
-  color: #333;              /* Use var(--fg) */
-  font-size: 16px;          /* Use var(--font-md) */
+  padding: 20px; /* Use var(--space-md) */
+  background: #ffffff; /* Use var(--bg) */
+  border: 1px solid #ddd; /* Use var(--border) */
+  border-radius: 8px; /* Use var(--radius) */
+  color: #333; /* Use var(--fg) */
+  font-size: 16px; /* Use var(--font-md) */
 }
 ```
 
 ### Available Token Variables
 
-| Category | Variables |
-|---|---|
-| Spacing | `--space-xs`, `--space-sm`, `--space-md`, `--space-lg` |
-| Colors | `--accent`, `--accent-hover`, `--fg`, `--fg-muted`, `--bg`, `--bg-subtle`, `--border` |
-| Status | `--success`, `--danger`, `--warning`, `--info` |
-| Typography | `--font-sm`, `--font-md`, `--font-lg` |
-| Radius | `--radius` |
-| Shadows | `--shadow`, `--shadow-strong` |
-| Focus | `--focus-ring` |
+| Category   | Variables                                                                             |
+| ---------- | ------------------------------------------------------------------------------------- |
+| Spacing    | `--space-xs`, `--space-sm`, `--space-md`, `--space-lg`                                |
+| Colors     | `--accent`, `--accent-hover`, `--fg`, `--fg-muted`, `--bg`, `--bg-subtle`, `--border` |
+| Status     | `--success`, `--danger`, `--warning`, `--info`                                        |
+| Typography | `--font-sm`, `--font-md`, `--font-lg`                                                 |
+| Radius     | `--radius`                                                                            |
+| Shadows    | `--shadow`, `--shadow-strong`                                                         |
+| Focus      | `--focus-ring`                                                                        |
 
 ### BEM-ish Class Names
 
@@ -142,16 +142,24 @@ Use numbered, BEM-style class names to avoid collisions between patterns:
 
 ```css
 /* Pattern 1 */
-.header-1 { }
-.header-1__logo { }
-.header-1__nav { }
-.header-1__link { }
-.header-1__link--active { }
+.header-1 {
+}
+.header-1__logo {
+}
+.header-1__nav {
+}
+.header-1__link {
+}
+.header-1__link--active {
+}
 
 /* Pattern 2 */
-.header-2 { }
-.header-2__logo { }
-.header-2__cta { }
+.header-2 {
+}
+.header-2__logo {
+}
+.header-2__cta {
+}
 ```
 
 The number suffix (e.g., `-1`, `-2`) ensures each pattern's styles are scoped even though all patterns share the same iframe token variables.
