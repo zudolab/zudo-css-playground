@@ -5,6 +5,8 @@ const categories = [
   { slug: "tabs", label: "Tabs", count: 6 },
   { slug: "toasts", label: "Toasts", count: 4 },
   { slug: "footers", label: "Footers", count: 4 },
+  { slug: "buttons", label: "Buttons", count: 10 },
+  { slug: "dialogs", label: "Dialogs", count: 3 },
 ];
 
 interface Props {
