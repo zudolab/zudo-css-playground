@@ -212,37 +212,37 @@ export default function AiChatModal() {
               key={i}
               className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
-              <div
-                className={`max-w-[85%] px-hsp-md py-vsp-xs rounded-lg text-small break-words ${
-                  msg.role === "user"
-                    ? "bg-accent/20 text-fg whitespace-pre-wrap"
-                    : "ai-chat-md bg-surface text-fg"
-                }`}
-                {...(msg.role === "assistant"
-                  ? {
-                      dangerouslySetInnerHTML: {
-                        __html: renderMarkdown(msg.content),
-                      },
-                    }
-                  : {})}
-              >
-                {msg.role === "user" ? msg.content : null}
-                {msg.needsReload && (
-                  <div className="mt-vsp-sm pt-vsp-xs border-t border-muted/20">
-                    {msg.filesWritten && (
-                      <p className="text-caption text-muted mb-vsp-xs">
-                        Files: {msg.filesWritten.join(", ")}
-                      </p>
-                    )}
-                    <button
-                      onClick={handleReload}
-                      className="bg-accent text-bg px-hsp-lg py-vsp-2xs rounded text-small font-medium cursor-pointer border-none hover:bg-accent-hover transition-colors"
-                    >
-                      Reload page to see results
-                    </button>
-                  </div>
-                )}
-              </div>
+              {msg.role === "assistant" ? (
+                <div className="max-w-[85%] rounded-lg overflow-hidden">
+                  <div
+                    className="ai-chat-md bg-surface text-fg px-hsp-md py-vsp-xs text-small break-words"
+                    dangerouslySetInnerHTML={{
+                      __html: renderMarkdown(msg.content),
+                    }}
+                  />
+                  {msg.needsReload && (
+                    <div className="bg-surface px-hsp-md pb-vsp-xs">
+                      <div className="pt-vsp-xs border-t border-muted/20">
+                        {msg.filesWritten && (
+                          <p className="text-caption text-muted mb-vsp-xs">
+                            Files: {msg.filesWritten.join(", ")}
+                          </p>
+                        )}
+                        <button
+                          onClick={handleReload}
+                          className="bg-accent text-bg px-hsp-lg py-vsp-2xs rounded text-small font-medium cursor-pointer border-none hover:bg-accent-hover transition-colors"
+                        >
+                          Reload page to see results
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="max-w-[85%] px-hsp-md py-vsp-xs rounded-lg text-small break-words bg-accent/20 text-fg whitespace-pre-wrap">
+                  {msg.content}
+                </div>
+              )}
             </div>
           ))}
           {loading && (
