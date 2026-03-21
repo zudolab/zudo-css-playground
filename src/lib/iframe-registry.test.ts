@@ -1,16 +1,18 @@
-import { describe, it, expect, beforeEach } from "vitest";
+// @vitest-environment jsdom
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   registerIframe,
-  unregisterIframe,
   applyToAllIframes,
   setGlobalOverrides,
   resetGlobalOverrides,
 } from "./iframe-registry";
 
 // Mock iframe with a fake contentDocument
-function createMockIframe(): HTMLIFrameElement {
+function createMockIframe(): HTMLIFrameElement & {
+  __styles: Record<string, string>;
+} {
   const styles: Record<string, string> = {};
-  const iframe = {
+  return {
     contentDocument: {
       documentElement: {
         style: {
@@ -23,21 +25,30 @@ function createMockIframe(): HTMLIFrameElement {
         },
       },
     },
-    // Expose styles for assertions
     __styles: styles,
   } as unknown as HTMLIFrameElement & { __styles: Record<string, string> };
-  return iframe;
 }
 
-// Clear the global registry between tests
+// Track mock iframes added to the "DOM"
+let domIframes: HTMLIFrameElement[] = [];
+
 beforeEach(() => {
+  // Clear overrides
   const w = globalThis as unknown as Record<string, unknown>;
-  delete w["__demoIframeRegistry"];
+  delete w["__demoTokenOverrides"];
+  // Reset DOM mock
+  domIframes = [];
+  vi.spyOn(document, "querySelectorAll").mockImplementation((selector) => {
+    if (selector === "iframe") {
+      return domIframes as unknown as NodeListOf<Element>;
+    }
+    return [] as unknown as NodeListOf<Element>;
+  });
 });
 
 describe("iframe-registry", () => {
-  describe("registerIframe / unregisterIframe", () => {
-    it("registers an iframe and applies existing overrides", () => {
+  describe("registerIframe", () => {
+    it("applies existing overrides to a newly loaded iframe", () => {
       setGlobalOverrides({ "--accent": "red" });
       const iframe = createMockIframe();
       registerIframe(iframe);
@@ -49,38 +60,38 @@ describe("iframe-registry", () => {
       registerIframe(iframe);
       expect(Object.keys(iframe.__styles)).toHaveLength(0);
     });
-
-    it("unregisters an iframe so it no longer receives updates", () => {
-      const iframe = createMockIframe();
-      registerIframe(iframe);
-      unregisterIframe(iframe);
-      applyToAllIframes("--fg", "blue");
-      expect(iframe.__styles["--fg"]).toBeUndefined();
-    });
   });
 
   describe("applyToAllIframes", () => {
-    it("applies a single variable to all registered iframes", () => {
+    it("applies a single variable to all iframes in the DOM", () => {
       const iframe1 = createMockIframe();
       const iframe2 = createMockIframe();
-      registerIframe(iframe1);
-      registerIframe(iframe2);
+      domIframes = [iframe1, iframe2];
       applyToAllIframes("--bg", "white");
       expect(iframe1.__styles["--bg"]).toBe("white");
       expect(iframe2.__styles["--bg"]).toBe("white");
     });
+
+    it("stores the override for future use", () => {
+      domIframes = [];
+      applyToAllIframes("--fg", "black");
+      // Now a new iframe loads and registers
+      const iframe = createMockIframe();
+      registerIframe(iframe);
+      expect(iframe.__styles["--fg"]).toBe("black");
+    });
   });
 
   describe("setGlobalOverrides", () => {
-    it("applies all overrides to all registered iframes", () => {
+    it("applies all overrides to all iframes in the DOM", () => {
       const iframe = createMockIframe();
-      registerIframe(iframe);
+      domIframes = [iframe];
       setGlobalOverrides({ "--accent": "blue", "--fg": "black" });
       expect(iframe.__styles["--accent"]).toBe("blue");
       expect(iframe.__styles["--fg"]).toBe("black");
     });
 
-    it("applies overrides to newly registered iframes", () => {
+    it("overrides are applied to newly registered iframes", () => {
       setGlobalOverrides({ "--accent": "green" });
       const iframe = createMockIframe();
       registerIframe(iframe);
@@ -89,9 +100,9 @@ describe("iframe-registry", () => {
   });
 
   describe("resetGlobalOverrides", () => {
-    it("removes all override properties from iframes", () => {
+    it("removes all override properties from iframes in the DOM", () => {
       const iframe = createMockIframe();
-      registerIframe(iframe);
+      domIframes = [iframe];
       setGlobalOverrides({ "--accent": "red", "--fg": "blue" });
       expect(iframe.__styles["--accent"]).toBe("red");
       resetGlobalOverrides();
@@ -105,18 +116,6 @@ describe("iframe-registry", () => {
       const iframe = createMockIframe();
       registerIframe(iframe);
       expect(Object.keys(iframe.__styles)).toHaveLength(0);
-    });
-  });
-
-  describe("shared global state", () => {
-    it("shares state via globalThis across separate imports", () => {
-      // Simulate two separate module scopes both accessing the registry
-      const iframe = createMockIframe();
-      registerIframe(iframe);
-      // State is on globalThis, so a second call to setGlobalOverrides
-      // from any module should reach the same iframe
-      setGlobalOverrides({ "--test": "shared" });
-      expect(iframe.__styles["--test"]).toBe("shared");
     });
   });
 });
