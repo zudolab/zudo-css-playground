@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicholasStb/tauri-docs/v2/tooling/cli/schema.json",
+  "identifier": "default",
+  "description": "Default capability set",
+  "windows": ["*"],
+  "permissions": [
+    "core:default",
+    "shell:allow-spawn",
+    "shell:allow-stdin-write",
+    {
+      "identifier": "http:default",
+      "allow": [{ "url": "http://localhost:4173" }]
+    }
+  ]
+}

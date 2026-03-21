@@ -1,0 +1,57 @@
+---
+import BaseLayout from "../layouts/base-layout.astro";
+---
+
+<BaseLayout title="Home">
+  <h1 class="text-heading font-bold mb-vsp-sm">CSS Playground</h1>
+  <p class="text-body text-muted mb-vsp-xl max-w-[640px]">
+    A collection of production-ready CSS patterns built with a strict token
+    system. Each pattern uses semantic color tokens, horizontal/vertical spacing
+    tokens, and typography tokens — no magic numbers.
+  </p>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-vsp-lg">
+    <a
+      href="/headers"
+      class="block p-hsp-lg bg-surface rounded-lg border border-muted/20 no-underline hover:border-accent/40 transition-colors"
+    >
+      <h2 class="text-subheading font-semibold text-fg mb-vsp-2xs">Headers</h2>
+      <p class="text-small text-muted">8 header and navigation patterns</p>
+    </a>
+    <a
+      href="/cards"
+      class="block p-hsp-lg bg-surface rounded-lg border border-muted/20 no-underline hover:border-accent/40 transition-colors"
+    >
+      <h2 class="text-subheading font-semibold text-fg mb-vsp-2xs">Cards</h2>
+      <p class="text-small text-muted">8 card layout patterns</p>
+    </a>
+    <a
+      href="/forms"
+      class="block p-hsp-lg bg-surface rounded-lg border border-muted/20 no-underline hover:border-accent/40 transition-colors"
+    >
+      <h2 class="text-subheading font-semibold text-fg mb-vsp-2xs">Forms</h2>
+      <p class="text-small text-muted">6 form input patterns</p>
+    </a>
+    <a
+      href="/tabs"
+      class="block p-hsp-lg bg-surface rounded-lg border border-muted/20 no-underline hover:border-accent/40 transition-colors"
+    >
+      <h2 class="text-subheading font-semibold text-fg mb-vsp-2xs">Tabs</h2>
+      <p class="text-small text-muted">6 tab navigation patterns</p>
+    </a>
+    <a
+      href="/toasts"
+      class="block p-hsp-lg bg-surface rounded-lg border border-muted/20 no-underline hover:border-accent/40 transition-colors"
+    >
+      <h2 class="text-subheading font-semibold text-fg mb-vsp-2xs">Toasts</h2>
+      <p class="text-small text-muted">4 toast notification patterns</p>
+    </a>
+    <a
+      href="/footers"
+      class="block p-hsp-lg bg-surface rounded-lg border border-muted/20 no-underline hover:border-accent/40 transition-colors"
+    >
+      <h2 class="text-subheading font-semibold text-fg mb-vsp-2xs">Footers</h2>
+      <p class="text-small text-muted">4 footer layout patterns</p>
+    </a>
+  </div>
+</BaseLayout>

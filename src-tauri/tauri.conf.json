@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicholasStb/tauri-docs/v2/tooling/cli/schema.json",
+  "productName": "CSS Playground",
+  "identifier": "com.takazudo.css-playground",
+  "build": {
+    "frontendDist": "../frontend",
+    "beforeDevCommand": "",
+    "beforeBuildCommand": ""
+  },
+  "app": {
+    "security": {
+      "csp": null
+    },
+    "macOSPrivateApi": true
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [],
+    "macOS": {
+      "minimumSystemVersion": "10.15"
+    },
+    "externalBin": ["binaries/node"]
+  }
+}

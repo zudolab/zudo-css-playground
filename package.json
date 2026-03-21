@@ -1,0 +1,38 @@
+{
+  "name": "zudo-css-playground",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "predev": "lsof -ti :4321 | xargs kill 2>/dev/null; true",
+    "dev": "astro dev",
+    "predev:net": "lsof -ti :4321 | xargs kill 2>/dev/null; true",
+    "dev:net": "astro dev --host 0.0.0.0",
+    "build": "astro build",
+    "prepreview": "lsof -ti :4321 | xargs kill 2>/dev/null; true",
+    "preview": "astro preview",
+    "prepreview:net": "lsof -ti :4321 | xargs kill 2>/dev/null; true",
+    "preview:net": "astro preview --host 0.0.0.0",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/node": "^9.5.5",
+    "@astrojs/react": "^4.2.1",
+    "astro": "^5.7.10",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.3",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "tailwindcss": "^4.1.3",
+    "typescript": "^5.8.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
+  }
+}
