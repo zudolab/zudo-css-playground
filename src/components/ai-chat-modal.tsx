@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { renderMarkdown } from "../utils/render-markdown";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -161,7 +162,7 @@ export default function AiChatModal() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault();
       sendMessage();
     }
@@ -196,9 +197,7 @@ export default function AiChatModal() {
               </p>
               <div className="text-caption text-muted/70 space-y-vsp-2xs">
                 <p>Try:</p>
-                <p className="text-accent/80">
-                  "Make 10 breadcrumb patterns"
-                </p>
+                <p className="text-accent/80">"Make 10 breadcrumb patterns"</p>
                 <p className="text-accent/80">
                   "Create 8 sidebar navigation variations"
                 </p>
@@ -214,13 +213,20 @@ export default function AiChatModal() {
               className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[85%] px-hsp-md py-vsp-xs rounded-lg text-small whitespace-pre-wrap break-words ${
+                className={`max-w-[85%] px-hsp-md py-vsp-xs rounded-lg text-small break-words ${
                   msg.role === "user"
-                    ? "bg-accent/20 text-fg"
-                    : "bg-surface text-fg"
+                    ? "bg-accent/20 text-fg whitespace-pre-wrap"
+                    : "ai-chat-md bg-surface text-fg"
                 }`}
+                {...(msg.role === "assistant"
+                  ? {
+                      dangerouslySetInnerHTML: {
+                        __html: renderMarkdown(msg.content),
+                      },
+                    }
+                  : {})}
               >
-                {msg.content}
+                {msg.role === "user" ? msg.content : null}
                 {msg.needsReload && (
                   <div className="mt-vsp-sm pt-vsp-xs border-t border-muted/20">
                     {msg.filesWritten && (

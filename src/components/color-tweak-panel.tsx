@@ -17,44 +17,105 @@ interface TweakState {
 const PRESETS: Record<string, TweakState> = {
   "Catppuccin Mocha": {
     palette: [
-      "#11111b", "#f38ba8", "#a6e3a1", "#f9e2af",
-      "#89b4fa", "#f5c2e7", "#94e2d5", "#cdd6f4",
-      "#585b70", "#f38ba8", "#a6e3a1", "#f9e2af",
-      "#89b4fa", "#f5c2e7", "#94e2d5", "#bac2de",
+      "#11111b",
+      "#f38ba8",
+      "#a6e3a1",
+      "#f9e2af",
+      "#89b4fa",
+      "#f5c2e7",
+      "#94e2d5",
+      "#cdd6f4",
+      "#585b70",
+      "#f38ba8",
+      "#a6e3a1",
+      "#f9e2af",
+      "#89b4fa",
+      "#f5c2e7",
+      "#94e2d5",
+      "#bac2de",
     ],
-    bg: "#1e1e2e", fg: "#cdd6f4", surface: "#313244", muted: "#6c7086",
-    accent: "#89b4fa", accentHover: "#b4d0fb",
-    success: "#a6e3a1", danger: "#f38ba8", warning: "#f9e2af", info: "#89dceb",
+    bg: "#1e1e2e",
+    fg: "#cdd6f4",
+    surface: "#313244",
+    muted: "#6c7086",
+    accent: "#89b4fa",
+    accentHover: "#b4d0fb",
+    success: "#a6e3a1",
+    danger: "#f38ba8",
+    warning: "#f9e2af",
+    info: "#89dceb",
   },
   Dracula: {
     palette: [
-      "#21222c", "#ff5555", "#50fa7b", "#f1fa8c",
-      "#bd93f9", "#ff79c6", "#8be9fd", "#f8f8f2",
-      "#6272a4", "#ff6e6e", "#69ff94", "#ffffa5",
-      "#d6acff", "#ff92df", "#a4ffff", "#ffffff",
+      "#21222c",
+      "#ff5555",
+      "#50fa7b",
+      "#f1fa8c",
+      "#bd93f9",
+      "#ff79c6",
+      "#8be9fd",
+      "#f8f8f2",
+      "#6272a4",
+      "#ff6e6e",
+      "#69ff94",
+      "#ffffa5",
+      "#d6acff",
+      "#ff92df",
+      "#a4ffff",
+      "#ffffff",
     ],
-    bg: "#282a36", fg: "#f8f8f2", surface: "#21222c", muted: "#86878b",
-    accent: "#8be9fd", accentHover: "#a4ffff",
-    success: "#50fa7b", danger: "#ff5555", warning: "#f1fa8c", info: "#bd93f9",
+    bg: "#282a36",
+    fg: "#f8f8f2",
+    surface: "#21222c",
+    muted: "#86878b",
+    accent: "#8be9fd",
+    accentHover: "#a4ffff",
+    success: "#50fa7b",
+    danger: "#ff5555",
+    warning: "#f1fa8c",
+    info: "#bd93f9",
   },
   Nord: {
     palette: [
-      "#2e3440", "#bf616a", "#a3be8c", "#ebcb8b",
-      "#81a1c1", "#b48ead", "#88c0d0", "#e5e9f0",
-      "#4c566a", "#bf616a", "#a3be8c", "#ebcb8b",
-      "#81a1c1", "#b48ead", "#88c0d0", "#eceff4",
+      "#2e3440",
+      "#bf616a",
+      "#a3be8c",
+      "#ebcb8b",
+      "#81a1c1",
+      "#b48ead",
+      "#88c0d0",
+      "#e5e9f0",
+      "#4c566a",
+      "#bf616a",
+      "#a3be8c",
+      "#ebcb8b",
+      "#81a1c1",
+      "#b48ead",
+      "#88c0d0",
+      "#eceff4",
     ],
-    bg: "#2e3440", fg: "#d8dee9", surface: "#3b4252", muted: "#616e88",
-    accent: "#88c0d0", accentHover: "#8fbcbb",
-    success: "#a3be8c", danger: "#bf616a", warning: "#ebcb8b", info: "#81a1c1",
+    bg: "#2e3440",
+    fg: "#d8dee9",
+    surface: "#3b4252",
+    muted: "#616e88",
+    accent: "#88c0d0",
+    accentHover: "#8fbcbb",
+    success: "#a3be8c",
+    danger: "#bf616a",
+    warning: "#ebcb8b",
+    info: "#81a1c1",
   },
 };
 
 const STORAGE_KEY = "cssp-tweak-state";
-const POSITION_KEY = "cssp-tweak-position";
+// Position is no longer persisted — panel centers on each open
 const PRESET_KEY = "cssp-tweak-preset";
 
-const SEMANTIC_FIELDS: { key: keyof Omit<TweakState, "palette">; label: string; cssVar: string }[] = [
+const SEMANTIC_FIELDS: {
+  key: keyof Omit<TweakState, "palette">;
+  label: string;
+  cssVar: string;
+}[] = [
   { key: "bg", label: "BG", cssVar: "--cssp-bg" },
   { key: "fg", label: "FG", cssVar: "--cssp-fg" },
   { key: "surface", label: "Surface", cssVar: "--cssp-surface" },
@@ -77,17 +138,18 @@ function loadState(): { state: TweakState; preset: string } {
   } catch {
     // ignore
   }
-  return { state: { ...PRESETS["Catppuccin Mocha"] }, preset: "Catppuccin Mocha" };
+  return {
+    state: { ...PRESETS["Catppuccin Mocha"] },
+    preset: "Catppuccin Mocha",
+  };
 }
 
-function loadPosition(): { x: number; y: number } {
-  try {
-    const saved = localStorage.getItem(POSITION_KEY);
-    if (saved) return JSON.parse(saved);
-  } catch {
-    // ignore
-  }
-  return { x: -1, y: -1 };
+function centerPosition(): { x: number; y: number } {
+  if (typeof window === "undefined") return { x: 0, y: 0 };
+  return {
+    x: Math.max(0, (window.innerWidth - 280) / 2),
+    y: Math.max(0, (window.innerHeight - 500) / 2),
+  };
 }
 
 function applyToDocument(state: TweakState) {
@@ -102,7 +164,7 @@ function applyToDocument(state: TweakState) {
 
 function loadInitial() {
   const { state, preset } = loadState();
-  return { state, preset, position: loadPosition() };
+  return { state, preset };
 }
 
 export default function ColorTweakPanel() {
@@ -110,17 +172,17 @@ export default function ColorTweakPanel() {
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<TweakState>(initial.state);
   const [preset, setPreset] = useState(initial.preset);
-  const [position, setPosition] = useState(initial.position);
+  const [position, setPosition] = useState(centerPosition);
   const panelRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
   const dragOffset = useRef({ x: 0, y: 0 });
 
-  // Initialize position on first render
+  // Re-center panel each time it opens
   useEffect(() => {
-    if (position.x === -1 && position.y === -1) {
-      setPosition({ x: window.innerWidth - 300, y: 16 });
+    if (open) {
+      setPosition(centerPosition());
     }
-  }, [position.x, position.y]);
+  }, [open]);
 
   // Apply colors on mount and state change
   useEffect(() => {
@@ -131,16 +193,6 @@ export default function ColorTweakPanel() {
       // ignore
     }
   }, [state]);
-
-  // Persist position
-  useEffect(() => {
-    if (position.x === -1) return;
-    try {
-      localStorage.setItem(POSITION_KEY, JSON.stringify(position));
-    } catch {
-      // ignore
-    }
-  }, [position]);
 
   // Drag handlers — only attach mousemove/mouseup during active drag
   const onMouseDown = useCallback(
@@ -155,8 +207,20 @@ export default function ColorTweakPanel() {
       const onMouseMove = (ev: MouseEvent) => {
         if (!dragging.current) return;
         setPosition({
-          x: Math.max(0, Math.min(ev.clientX - dragOffset.current.x, window.innerWidth - 280)),
-          y: Math.max(0, Math.min(ev.clientY - dragOffset.current.y, window.innerHeight - 100)),
+          x: Math.max(
+            0,
+            Math.min(
+              ev.clientX - dragOffset.current.x,
+              window.innerWidth - 280,
+            ),
+          ),
+          y: Math.max(
+            0,
+            Math.min(
+              ev.clientY - dragOffset.current.y,
+              window.innerHeight - 100,
+            ),
+          ),
         });
       };
       const onMouseUp = () => {
@@ -178,7 +242,10 @@ export default function ColorTweakPanel() {
     });
   };
 
-  const updateSemantic = (key: keyof Omit<TweakState, "palette">, color: string) => {
+  const updateSemantic = (
+    key: keyof Omit<TweakState, "palette">,
+    color: string,
+  ) => {
     setState((prev) => ({ ...prev, [key]: color }));
   };
 
@@ -211,7 +278,8 @@ export default function ColorTweakPanel() {
         height: 36,
         borderRadius: "50%",
         border: "2px solid rgba(255,255,255,0.15)",
-        background: "linear-gradient(135deg, #89b4fa 0%, #f5c2e7 50%, #a6e3a1 100%)",
+        background:
+          "linear-gradient(135deg, #89b4fa 0%, #f5c2e7 50%, #a6e3a1 100%)",
         cursor: "pointer",
         display: "flex",
         alignItems: "center",
@@ -222,7 +290,16 @@ export default function ColorTweakPanel() {
       }}
       title="Toggle Color Tweak Panel"
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e1e2e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#1e1e2e"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <circle cx="12" cy="12" r="10" />
         <circle cx="12" cy="8" r="2" fill="#1e1e2e" />
         <circle cx="8" cy="14" r="2" fill="#1e1e2e" />
@@ -288,7 +365,14 @@ export default function ColorTweakPanel() {
 
         <div style={{ padding: "8px 12px" }}>
           {/* Preset + Reset row */}
-          <div style={{ display: "flex", gap: 6, marginBottom: 10, alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: 6,
+              marginBottom: 10,
+              alignItems: "center",
+            }}
+          >
             <select
               value={preset}
               onChange={(e) => applyPreset(e.target.value)}
@@ -422,7 +506,9 @@ export default function ColorTweakPanel() {
                       flexShrink: 0,
                     }}
                   />
-                  <span style={{ fontSize: 11, color: state.muted }}>{label}</span>
+                  <span style={{ fontSize: 11, color: state.muted }}>
+                    {label}
+                  </span>
                 </label>
               ))}
             </div>
