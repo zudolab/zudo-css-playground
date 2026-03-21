@@ -1,0 +1,102 @@
+---
+sidebar_position: 1
+title: Getting Started
+---
+
+# Getting Started
+
+## What is CSS Playground?
+
+CSS Playground is an AI-driven app for generating and previewing UI component patterns. It enforces a strict design token system so that every pattern — whether created by a human or AI — uses consistent spacing, colors, typography, and other design primitives.
+
+Built with Astro 5, React 19, and Tailwind CSS v4, it provides:
+
+- A library of pre-built UI component patterns (headers, cards, forms, tabs, toasts, footers)
+- An AI chat interface that generates new pattern categories on demand
+- A floating color tweak panel with preset themes
+- Iframe-based live previews with responsive viewport switching
+- An optional Tauri desktop wrapper
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js >= 20
+- pnpm package manager
+
+### Install and Run
+
+```bash
+# Clone the repository
+git clone <repo-url>
+cd zudo-css-playground
+
+# Install dependencies
+pnpm install
+
+# Start the dev server
+pnpm dev
+```
+
+The dev server starts at `http://localhost:4321`.
+
+### Available Scripts
+
+| Script | Description |
+|---|---|
+| `pnpm dev` | Start dev server on localhost:4321 |
+| `pnpm dev:net` | Start dev server on 0.0.0.0 (LAN accessible) |
+| `pnpm build` | Production build |
+| `pnpm preview` | Preview the production build |
+| `pnpm preview:net` | Preview on LAN |
+
+Port cleanup happens automatically via pre-hooks — any stale process on port 4321 is killed before each dev/preview start.
+
+## Using the AI Chat
+
+The AI chat lets you generate entirely new pattern categories by describing what you want.
+
+### How to Open
+
+Click the **AI Chat** button at the bottom of the sidebar to open the chat modal.
+
+### How It Works
+
+1. Type a request like "Make 10 breadcrumb patterns" or "Create 8 sidebar navigation variations"
+2. The AI generates patterns using the project's design token system
+3. Pattern files (`.astro` pages) are written to disk automatically
+4. The sidebar navigation is updated with the new category
+5. Click **Reload page to see results** to view the new patterns
+
+### What the AI Knows
+
+The AI is given the full token variable reference and strict instructions to never use arbitrary values. Every pattern it creates uses `var(--space-*)`, `var(--accent)`, `var(--fg)`, and other token variables exclusively.
+
+### Limitations
+
+- One request at a time (rate limited to 1 concurrent request)
+- Message length: 4000 characters max
+- Conversation history: 20 messages max
+- Response timeout: 60 seconds
+
+## Using the Color Tweak Panel
+
+The color tweak panel lets you experiment with different color schemes in real time.
+
+### How to Open
+
+Click the circular gradient button in the top-right corner of the page.
+
+### Features
+
+- **Preset themes**: Switch between Catppuccin Mocha (default), Dracula, and Nord
+- **Palette editing**: Adjust all 16 raw palette colors (p0–p15) via color pickers in a 4×4 grid
+- **Semantic editing**: Adjust the 10 semantic color tokens (BG, FG, Surface, Muted, Accent, Accent Hover, Success, Danger, Warning, Info)
+- **Drag to reposition**: Grab the title bar to move the panel anywhere on screen
+- **Persistent state**: Your color choices and panel position are saved to localStorage
+
+### How It Works
+
+The panel updates CSS custom properties (`--cssp-*`) on `document.documentElement.style` in real time. Since all components and patterns reference these variables, every element on the page responds instantly to color changes.
+
+Click **Reset** to restore the current preset's default colors.

@@ -1,0 +1,215 @@
+---
+sidebar_position: 4
+title: Pattern Format
+---
+
+# Pattern Format
+
+Patterns are Astro pages that display UI component variations using the HtmlPreview component. Each category (headers, cards, forms, etc.) is a single `.astro` file in `src/pages/`.
+
+## Astro Page Template
+
+Every pattern page follows this structure:
+
+```astro
+---
+import BaseLayout from '../layouts/base-layout.astro';
+import HtmlPreview from '../components/html-preview.tsx';
+---
+
+<BaseLayout title="Category Name" activeCategory="slug">
+  <h1 class="text-heading font-bold mb-vsp-lg">Category Name Patterns</h1>
+  <p class="text-body text-muted mb-vsp-xl">
+    N variations built with strict design tokens.
+  </p>
+
+  <div class="space-y-vsp-xl">
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">1. Pattern Name</h2>
+      <HtmlPreview
+        client:visible
+        title="Pattern Name"
+        html={`<div class="pattern-1">...</div>`}
+        css={`
+.pattern-1 {
+  padding: var(--space-md);
+  background: var(--bg);
+  color: var(--fg);
+}
+        `}
+        height={200}
+      />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">2. Another Pattern</h2>
+      <HtmlPreview
+        client:visible
+        title="Another Pattern"
+        html={`<div class="pattern-2">...</div>`}
+        css={`...`}
+        height={150}
+      />
+    </section>
+  </div>
+</BaseLayout>
+```
+
+### Key Points
+
+- **BaseLayout props**: `title` sets the page `<title>`, `activeCategory` highlights the sidebar link
+- **HtmlPreview hydration**: Always use `client:visible` (not `client:load`) for performance — previews only hydrate when scrolled into view
+- **Section structure**: Each pattern is wrapped in a `<section>` with a numbered `<h2>` heading
+- **Spacing**: Use Tailwind token classes (`text-heading`, `mb-vsp-lg`, `space-y-vsp-xl`) for page-level layout
+
+## How HtmlPreview Works
+
+Each HtmlPreview renders an isolated iframe with:
+
+1. A CSS reset (`*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }`)
+2. Base styles (`body { font-family: system-ui, sans-serif; }`)
+3. Inherited form styles (`input, button, textarea, select { font-family: inherit; }`)
+4. Focus visible styles (`:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }`)
+5. The `BASE_TOKENS` — shared design token variables (see [Token System](/docs/specs/token-system#in-htmlpreview-demos--base_tokens))
+6. The pattern's custom CSS (from the `css` prop)
+7. The pattern's HTML (from the `html` prop) in the `<body>`
+
+The iframe uses `sandbox="allow-same-origin"` for security. No JavaScript runs inside pattern demos.
+
+### Viewport Switching
+
+The toolbar provides three viewport options:
+
+| Button | Width | Use Case |
+|---|---|---|
+| Mobile | 320px | Small phone screens |
+| Tablet | 768px | Tablet/small laptop |
+| Full | 100% | Full container width |
+
+### Height
+
+- If `height` is provided, the iframe uses that fixed height
+- If omitted, the component measures `body.scrollHeight` after the iframe loads and adds 16px padding
+
+### Code View
+
+The **Show Code** button reveals the raw HTML and CSS in a collapsible section below the preview. This lets users inspect and copy the pattern source.
+
+## CSS Conventions in Demos
+
+### Token Variables Only
+
+All CSS values must come from the BASE_TOKENS variables. No arbitrary values are allowed.
+
+```css
+/* CORRECT */
+.card {
+  padding: var(--space-md);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: var(--fg);
+  font-size: var(--font-md);
+}
+
+/* WRONG — arbitrary values */
+.card {
+  padding: 20px;           /* Use var(--space-md) */
+  background: #ffffff;      /* Use var(--bg) */
+  border: 1px solid #ddd;   /* Use var(--border) */
+  border-radius: 8px;       /* Use var(--radius) */
+  color: #333;              /* Use var(--fg) */
+  font-size: 16px;          /* Use var(--font-md) */
+}
+```
+
+### Available Token Variables
+
+| Category | Variables |
+|---|---|
+| Spacing | `--space-xs`, `--space-sm`, `--space-md`, `--space-lg` |
+| Colors | `--accent`, `--accent-hover`, `--fg`, `--fg-muted`, `--bg`, `--bg-subtle`, `--border` |
+| Status | `--success`, `--danger`, `--warning`, `--info` |
+| Typography | `--font-sm`, `--font-md`, `--font-lg` |
+| Radius | `--radius` |
+| Shadows | `--shadow`, `--shadow-strong` |
+| Focus | `--focus-ring` |
+
+### BEM-ish Class Names
+
+Use numbered, BEM-style class names to avoid collisions between patterns:
+
+```css
+/* Pattern 1 */
+.header-1 { }
+.header-1__logo { }
+.header-1__nav { }
+.header-1__link { }
+.header-1__link--active { }
+
+/* Pattern 2 */
+.header-2 { }
+.header-2__logo { }
+.header-2__cta { }
+```
+
+The number suffix (e.g., `-1`, `-2`) ensures each pattern's styles are scoped even though all patterns share the same iframe token variables.
+
+### CSS-Only Interactions
+
+Patterns should use CSS for all interactivity — no JavaScript. Common techniques:
+
+```css
+/* Hover effects */
+.button:hover {
+  background: var(--accent-hover);
+}
+
+/* Focus styles (already provided by iframe reset) */
+.input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Transitions */
+.link {
+  transition: color 0.2s;
+}
+.link:hover {
+  color: var(--accent);
+}
+```
+
+## How to Add a New Pattern Category Manually
+
+1. Create a new file in `src/pages/`, e.g., `breadcrumbs.astro`
+2. Follow the Astro page template above
+3. Add the category to the `categories` array in `src/components/sidebar-nav.tsx`:
+
+```typescript
+const categories = [
+  { slug: "headers", label: "Headers", count: 8 },
+  { slug: "cards", label: "Cards", count: 8 },
+  // ... existing categories ...
+  { slug: "breadcrumbs", label: "Breadcrumbs", count: 10 },
+];
+```
+
+4. Restart the dev server to pick up the new file
+
+## How AI Adds Categories Automatically
+
+When the AI creates patterns via the `/api/ai-chat` endpoint:
+
+1. The AI responds with a JSON object containing the `.astro` file content and sidebar entry metadata
+2. The server writes the `.astro` file to `src/pages/`
+3. The server calls `updateSidebarNav()` which:
+   - Reads `sidebar-nav.tsx` from disk
+   - If the category slug exists: updates the count
+   - If new: inserts a new entry into the categories array (before the closing `];`)
+   - Writes the modified file back to disk
+4. The client shows a "Reload page to see results" button
+5. After reload, Astro picks up the new page and the updated sidebar
+
+The entire flow — from user request to visible new category — requires only a page reload. No server restart is needed because Astro's dev server watches for file changes.

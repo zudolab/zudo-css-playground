@@ -1,0 +1,173 @@
+---
+sidebar_position: 1
+title: Project Structure
+---
+
+# Project Structure
+
+## Directory Layout
+
+```
+zudo-css-playground/
+├── src/
+│   ├── components/          # React islands (client:load / client:visible)
+│   │   ├── ai-chat-modal.tsx
+│   │   ├── color-tweak-panel.tsx
+│   │   ├── html-preview.tsx
+│   │   └── sidebar-nav.tsx
+│   ├── layouts/
+│   │   └── base-layout.astro   # Main page wrapper
+│   ├── pages/
+│   │   ├── api/
+│   │   │   └── ai-chat.ts      # POST /api/ai-chat endpoint
+│   │   ├── index.astro          # Home page (category grid)
+│   │   ├── headers.astro        # 8 header patterns
+│   │   ├── cards.astro          # 8 card patterns
+│   │   ├── forms.astro          # 6 form patterns
+│   │   ├── tabs.astro           # 6 tab patterns
+│   │   ├── toasts.astro         # 4 toast patterns
+│   │   └── footers.astro        # 4 footer patterns
+│   └── styles/
+│       └── tokens.css           # Design token definitions
+├── src-tauri/                   # Tauri desktop wrapper (optional)
+│   ├── src/
+│   │   └── main.rs              # App entry, sidecar management
+│   ├── tauri.conf.json          # Tauri config
+│   ├── Cargo.toml               # Rust dependencies
+│   └── capabilities/
+│       └── default.json
+├── frontend/
+│   └── index.html               # Tauri loading screen
+├── scripts/
+│   └── download-node.sh         # Download Node.js for Tauri bundle
+├── astro.config.ts
+├── package.json
+├── pnpm-lock.yaml
+└── tsconfig.json
+```
+
+## Main App — Astro 5 + React 19 + Tailwind v4
+
+The main application is an Astro 5 site with hybrid SSR rendering.
+
+### Astro Configuration
+
+```typescript
+// astro.config.ts
+import { defineConfig } from "astro/config";
+import react from "@astrojs/react";
+import tailwindcss from "@tailwindcss/vite";
+import node from "@astrojs/node";
+
+export default defineConfig({
+  adapter: node({ mode: "standalone" }),
+  integrations: [react()],
+  vite: {
+    plugins: [tailwindcss()],
+  },
+});
+```
+
+Key choices:
+
+- **Node adapter (standalone mode)**: Creates a self-contained dist with an embedded server, required for the API route (`/api/ai-chat`)
+- **React integration**: Enables `.tsx` component islands with selective hydration
+- **Tailwind v4 via Vite plugin**: Uses the new `@tailwindcss/vite` plugin instead of PostCSS
+
+### Rendering Model
+
+- **Static pages** (`src/pages/*.astro`): Pattern category pages are pre-rendered at build time
+- **SSR route** (`src/pages/api/ai-chat.ts`): The AI endpoint runs server-side with `export const prerender = false`
+
+### React Islands
+
+Astro's island architecture means React components only hydrate where needed:
+
+| Directive | Used By | Reason |
+|---|---|---|
+| `client:load` | SidebarNav, ColorTweakPanel, AiChatModal | Interactive from page load |
+| `client:visible` | HtmlPreview | Hydrates when scrolled into view (performance) |
+
+## Doc Site — Docusaurus
+
+The `doc/` directory contains a separate Docusaurus site for project documentation. It is an independent sub-package with its own `package.json` and build pipeline.
+
+```bash
+cd doc
+pnpm install
+pnpm start    # Dev server
+pnpm build    # Production build
+```
+
+The doc site documents the token system, component architecture, API specs, and usage guides.
+
+## Tauri Wrapper — Optional Desktop App
+
+The `src-tauri/` directory contains a Tauri v2 application that wraps the Astro site as a native desktop app.
+
+### How It Works
+
+1. Tauri bundles a Node.js binary as an external sidecar (`binaries/node`)
+2. On launch, it kills any stale process on port 4173
+3. It spawns Node.js to run `astro preview --port 4173` in the background
+4. It polls for server readiness (TCP connection check, max 30s)
+5. Once ready, it navigates the webview to `http://localhost:4173`
+6. On window close, it terminates the sidecar and cleans up the port
+
+### Tauri Dependencies
+
+- `tauri` v2 — Core framework
+- `tauri_plugin_shell` — Sidecar process spawning
+- `libc` — POSIX signal handling for process cleanup
+- `serde` / `serde_json` — Configuration parsing
+
+### Building for Desktop
+
+```bash
+# Download the Node.js binary (required once)
+bash scripts/download-node.sh
+
+# Development mode
+cd src-tauri
+cargo tauri dev
+
+# Production build (creates .app bundle)
+cargo tauri build
+```
+
+## How the Pieces Connect
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Tauri Shell (optional)                             │
+│  - Spawns Node.js sidecar                           │
+│  - Navigates webview to localhost:4173              │
+│                                                     │
+│  ┌───────────────────────────────────────────────┐  │
+│  │  Astro 5 App                                  │  │
+│  │                                               │  │
+│  │  ┌─────────┐  ┌──────────────────────────┐   │  │
+│  │  │ Sidebar │  │ Main Content             │   │  │
+│  │  │ Nav     │  │ (pattern pages with      │   │  │
+│  │  │         │  │  HtmlPreview iframes)    │   │  │
+│  │  │ AI Chat │  │                          │   │  │
+│  │  │ button  │  │                          │   │  │
+│  │  └─────────┘  └──────────────────────────┘   │  │
+│  │                                               │  │
+│  │  ┌──────────────┐  ┌─────────────────────┐   │  │
+│  │  │ ColorTweak   │  │ AiChatModal         │   │  │
+│  │  │ Panel        │  │ → POST /api/ai-chat │   │  │
+│  │  │ (floating)   │  │ → claude CLI        │   │  │
+│  │  └──────────────┘  │ → write .astro file │   │  │
+│  │                     │ → update sidebar    │   │  │
+│  │                     └─────────────────────┘   │  │
+│  └───────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────┘
+
+  ┌───────────────────────┐
+  │ Doc Site (Docusaurus)  │  ← separate package in doc/
+  │ Specs, guides, API ref │
+  └───────────────────────┘
+```
+
+All tokens are defined in `src/styles/tokens.css` and flow into both the Tailwind theme (for component styling) and the HtmlPreview `BASE_TOKENS` (for iframe demos).
