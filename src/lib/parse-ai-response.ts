@@ -16,7 +16,7 @@ export function parseAiResponse(rawResponse: string): ParsedAiResponse {
   try {
     // Strip markdown code fences if AI wrapped it
     const cleaned = rawResponse
-      .replace(/^```json?\n?/i, "")
+      .replace(/^```[a-z]*\n?/i, "")
       .replace(/\n?```$/i, "")
       .trim();
     parsed = JSON.parse(cleaned);

@@ -1,32 +1,32 @@
 import { describe, it, expect } from "vitest";
-import { validateAstroFilename } from "./validate-astro-filename";
+import { isValidAstroFilename } from "./validate-astro-filename";
 
-describe("validateAstroFilename", () => {
+describe("isValidAstroFilename", () => {
   it("accepts a simple .astro filename", () => {
-    expect(validateAstroFilename("breadcrumbs.astro")).toBe(true);
+    expect(isValidAstroFilename("breadcrumbs.astro")).toBe(true);
   });
 
   it("accepts hyphenated .astro filenames", () => {
-    expect(validateAstroFilename("pricing-table.astro")).toBe(true);
+    expect(isValidAstroFilename("pricing-table.astro")).toBe(true);
   });
 
   it("rejects filenames without .astro extension", () => {
-    expect(validateAstroFilename("breadcrumbs.tsx")).toBe(false);
-    expect(validateAstroFilename("breadcrumbs.html")).toBe(false);
-    expect(validateAstroFilename("breadcrumbs")).toBe(false);
+    expect(isValidAstroFilename("breadcrumbs.tsx")).toBe(false);
+    expect(isValidAstroFilename("breadcrumbs.html")).toBe(false);
+    expect(isValidAstroFilename("breadcrumbs")).toBe(false);
   });
 
   it("rejects filenames with directory traversal (..)", () => {
-    expect(validateAstroFilename("../evil.astro")).toBe(false);
-    expect(validateAstroFilename("foo..bar.astro")).toBe(false);
+    expect(isValidAstroFilename("../evil.astro")).toBe(false);
+    expect(isValidAstroFilename("foo..bar.astro")).toBe(false);
   });
 
   it("rejects filenames with path separators (/)", () => {
-    expect(validateAstroFilename("sub/page.astro")).toBe(false);
-    expect(validateAstroFilename("/root.astro")).toBe(false);
+    expect(isValidAstroFilename("sub/page.astro")).toBe(false);
+    expect(isValidAstroFilename("/root.astro")).toBe(false);
   });
 
   it("rejects empty strings", () => {
-    expect(validateAstroFilename("")).toBe(false);
+    expect(isValidAstroFilename("")).toBe(false);
   });
 });
