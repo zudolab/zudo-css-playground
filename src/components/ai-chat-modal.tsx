@@ -129,10 +129,25 @@ export default function AiChatModal() {
         const data = await res.json();
         if (data.error) {
           setError(data.error);
-        } else if (data.action === "files_written") {
-          // Files were created — show success with reload button
+        } else if (data.action === "pending_files") {
+          // AI generated files — write them to disk via apply endpoint
           setLoadingPhase("Writing files and updating navigation...");
-          await new Promise((r) => setTimeout(r, 500));
+          const applyRes = await fetch("/api/ai-chat-apply", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              files: data.files,
+              sidebarEntry: data.sidebarEntry,
+            }),
+            signal: abort.signal,
+          });
+          const applyData = await applyRes.json();
+
+          const filesWritten: string[] =
+            applyData.files ??
+            (data.files
+              ? Object.keys(data.files as Record<string, string>)
+              : []);
 
           setMessages([
             ...newMessages,
@@ -140,7 +155,7 @@ export default function AiChatModal() {
               role: "assistant",
               content: data.message,
               needsReload: true,
-              filesWritten: data.files,
+              filesWritten,
             },
           ]);
         } else {
