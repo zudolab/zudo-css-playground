@@ -5,17 +5,23 @@ title: AI API
 
 # AI API
 
-The AI chat API enables pattern generation through a local Claude CLI integration. The endpoint receives user messages, spawns a Claude process, and writes pattern files to disk.
+The AI chat API enables pattern generation through a local Claude CLI integration. The system uses a **two-step deferred file writing** pattern: the chat endpoint generates content and returns it to the client, and a separate apply endpoint writes files to disk when the user confirms.
 
-## Endpoint
+## Endpoints
 
-```
-POST /api/ai-chat
-```
+### POST /api/ai-chat
 
-This route is server-side rendered (`export const prerender = false`) and requires the Node adapter.
+Generates AI responses. For pattern creation, returns pending file content without writing to disk (prevents Astro HMR from reloading the page before the response reaches the client).
+
+### POST /api/ai-chat-apply
+
+Writes pending files to disk and updates the sidebar navigation. Called by the client when the user clicks "Apply & Reload".
+
+Both routes are server-side rendered (`export const prerender = false`) and require the Node adapter.
 
 ## Request Format
+
+### /api/ai-chat
 
 ```typescript
 {
@@ -29,27 +35,51 @@ interface ChatMessage {
 }
 ```
 
+### /api/ai-chat-apply
+
+```typescript
+{
+  files: Record<string, string>;  // filename → file content
+  sidebarEntry?: {
+    slug: string;
+    label: string;
+    count: number;
+  };
+}
+```
+
 ### Validation Rules
 
-| Field | Constraint |
-|---|---|
-| `message` | Required, non-empty string, max 4000 characters |
-| `history` | Optional array, max 20 entries. Each entry must have valid `role` ("user" or "assistant") and `content` (string, max 4000 chars) |
+| Field           | Constraint                                                                                                                       |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `message`       | Required, non-empty string, max 4000 characters                                                                                  |
+| `history`       | Optional array, max 20 entries. Each entry must have valid `role` ("user" or "assistant") and `content` (string, max 4000 chars) |
+| `files` (apply) | Required, must be an object. Only `.astro` filenames without `..` or `/` are accepted                                            |
 
 ## Response Format
 
-### Pattern Creation (files_written)
+### Pattern Creation (pending_files)
 
-When the AI creates new pattern files:
+When the AI creates new patterns, the chat endpoint returns the file content without writing to disk:
 
 ```json
 {
-  "action": "files_written",
+  "action": "pending_files",
+  "pendingFiles": {
+    "breadcrumbs.astro": "<full Astro page content>"
+  },
+  "sidebarEntry": {
+    "slug": "breadcrumbs",
+    "label": "Breadcrumbs",
+    "count": 10
+  },
   "files": ["breadcrumbs.astro"],
-  "message": "Created 10 breadcrumb patterns! Click reload to see them.",
+  "message": "Created 10 breadcrumb patterns!",
   "needsReload": true
 }
 ```
+
+The client stores the pending files in component state and displays a success message with an "Apply & Reload" button. When clicked, the client sends the pending files to `/api/ai-chat-apply`, which writes them to disk, then reloads the page.
 
 ### Chat Response
 
@@ -62,6 +92,15 @@ When the AI responds with text (no file creation):
 }
 ```
 
+### Apply Response
+
+```json
+{
+  "ok": true,
+  "files": ["breadcrumbs.astro"]
+}
+```
+
 ### Error Responses
 
 ```json
@@ -69,12 +108,13 @@ When the AI responds with text (no file creation):
 { "error": "message required" }
 { "error": "message too long" }
 { "error": "Invalid JSON" }
+{ "error": "files required" }
 
 // 429 Too Many Requests
 { "error": "Another request is in progress. Please wait." }
 
 // 500 Internal Server Error
-{ "error": "Timeout after 60s" }
+{ "error": "Timeout after 480s" }
 { "error": "claude exited 1: <stderr output>" }
 { "error": "Spawn failed: <error message>" }
 ```
@@ -120,7 +160,11 @@ The system prompt defines two response formats:
 }
 ```
 
-## How AI Writes Files
+## Deferred File Writing Flow
+
+### Why Deferred?
+
+In development, Astro's file watcher triggers hot module replacement (HMR) whenever files change on disk. If the AI endpoint wrote `.astro` files directly, the page would reload before the fetch response reached the client — destroying the chat modal state and preventing the user from seeing the result.
 
 ### Process Flow
 
@@ -131,51 +175,58 @@ The system prompt defines two response formats:
    ```bash
    claude -p --model haiku --max-budget-usd 0.50 --system-prompt "..." < prompt
    ```
-5. **Parse response**: Strip any markdown code fences, parse as JSON
+5. **Parse response**: Strip any markdown code fences, parse as JSON (handled by `parseAiResponse()` in `src/lib/parse-ai-response.ts`)
 6. **If `action: "create_patterns"`**:
-   - Write each `.astro` file to `src/pages/`
-   - Update `sidebar-nav.tsx` with the new category
-   - Return `{ action: "files_written", ... }`
-7. **If `action: "chat"` or plain text**:
-   - Return `{ action: "chat", message: "..." }`
+   - Validate filenames (handled by `isValidAstroFilename()` in `src/lib/validate-astro-filename.ts`)
+   - Return `{ action: "pending_files", pendingFiles: {...}, ... }` — files are NOT written yet
+7. **Client shows success message** with "Apply & Reload" button
+8. **User clicks "Apply & Reload"**:
+   - Client sends pending files to `POST /api/ai-chat-apply`
+   - Apply endpoint writes `.astro` files to `src/pages/`
+   - Apply endpoint updates `sidebar-nav.tsx` via `updateSidebarNavContent()` in `src/lib/update-sidebar-nav.ts`
+   - Client reloads the page
 
 ### File Safety
 
-The endpoint enforces strict file writing rules:
+Both endpoints enforce strict file writing rules:
 
 - Only `.astro` files are written (other extensions are silently skipped)
 - Path traversal is blocked (`..` and `/` in filenames are rejected)
 - All files are written to the `src/pages/` directory only
+- Validation is handled by the shared `isValidAstroFilename()` function
+
+## Shared Library Modules
+
+The AI API logic is organized into shared, testable modules in `src/lib/`:
+
+| Module                       | Purpose                                                    |
+| ---------------------------- | ---------------------------------------------------------- |
+| `parse-ai-response.ts`       | JSON parsing, code fence stripping, response routing       |
+| `validate-astro-filename.ts` | `.astro` filename validation (no `..`, no `/`)             |
+| `update-sidebar-nav.ts`      | Sidebar categories array manipulation (add/update entries) |
+
+These modules are imported by both `ai-chat.ts` and `ai-chat-apply.ts`, eliminating code duplication.
 
 ## How sidebar-nav.tsx Is Auto-Updated
 
-The `updateSidebarNav()` function modifies the sidebar categories:
+The `updateSidebarNavContent()` function modifies the sidebar categories:
 
 ```typescript
-function updateSidebarNav(entry: {
-  slug: string;
-  label: string;
-  count: number;
-}) {
-  // 1. Read sidebar-nav.tsx from disk
-  // 2. Check if category slug already exists
-  //    → If yes: update the count via regex
-  //    → If no: insert a new entry before the closing "];"
-  // 3. Write the modified file back to disk
-}
+function updateSidebarNavContent(
+  content: string,
+  entry: { slug: string; label: string; count: number },
+): string;
 ```
 
-The update uses regex-based string manipulation (not AST parsing) to modify the categories array in the source file.
+It handles multiple array formats:
 
-**Example**: If the AI creates a "breadcrumbs" category with 10 patterns, this line is inserted:
-
-```typescript
-  { slug: "breadcrumbs", label: "Breadcrumbs", count: 10 },
-```
+- **Single-line empty array**: `const categories: ... [] = [];` → expands to multi-line with new entry
+- **Multi-line array**: Inserts new entry before closing `];`
+- **Existing category**: Updates the count via regex match
 
 ## Rate Limiting
 
-The endpoint uses a simple in-memory `inFlight` flag:
+The chat endpoint uses a simple in-memory `inFlight` flag:
 
 - Only **1 concurrent request** is allowed
 - Additional requests receive HTTP 429 with `"Another request is in progress. Please wait."`
@@ -185,41 +236,55 @@ This is a module-level variable, so it works within a single Node.js process. It
 
 ## Input Validation
 
-| Check | Behavior |
-|---|---|
-| Missing or non-string `message` | 400: "message required" |
-| `message` > 4000 chars | 400: "message too long" |
-| Invalid JSON body | 400: "Invalid JSON" |
-| `history` items with invalid `role` | Silently filtered out |
-| `history` items with `content` > 4000 chars | Silently filtered out |
-| `history` > 20 items | Truncated to last 20 |
-| Concurrent request | 429: "Another request is in progress" |
+| Check                                       | Behavior                              |
+| ------------------------------------------- | ------------------------------------- |
+| Missing or non-string `message`             | 400: "message required"               |
+| `message` > 4000 chars                      | 400: "message too long"               |
+| Invalid JSON body                           | 400: "Invalid JSON"                   |
+| `history` items with invalid `role`         | Silently filtered out                 |
+| `history` items with `content` > 4000 chars | Silently filtered out                 |
+| `history` > 20 items                        | Truncated to last 20                  |
+| Concurrent request                          | 429: "Another request is in progress" |
 
 ## Local Claude CLI Integration
 
 The API spawns the `claude` CLI as a child process:
 
 ```typescript
-const proc = spawn("claude", [
-  "-p",
-  "--model", "haiku",
-  "--max-budget-usd", "0.50",
-  "--system-prompt", SYSTEM_PROMPT,
-], { stdio: ["pipe", "pipe", "pipe"] });
+const proc = spawn(
+  "claude",
+  [
+    "-p",
+    "--model",
+    "haiku",
+    "--max-budget-usd",
+    "0.50",
+    "--system-prompt",
+    SYSTEM_PROMPT,
+  ],
+  { stdio: ["pipe", "pipe", "pipe"] },
+);
 ```
 
 ### Configuration
 
-| Parameter | Value |
-|---|---|
-| Mode | `-p` (pipe/non-interactive) |
-| Model | `haiku` |
-| Budget limit | $0.50 per request |
-| Timeout | 60 seconds |
+| Parameter    | Value                       |
+| ------------ | --------------------------- |
+| Mode         | `-p` (pipe/non-interactive) |
+| Model        | `haiku`                     |
+| Budget limit | $0.50 per request           |
+| Timeout      | 480 seconds                 |
 
 ### Error Handling
 
-- **Timeout**: After 60s, the process is killed with `proc.kill()` and a "Timeout after 60s" error is returned
+- **Timeout**: After 480s, the process is killed with `proc.kill()` and a "Timeout after 480s" error is returned
 - **Non-zero exit code**: Returns the stderr output in the error message
 - **Spawn failure**: Returns "Spawn failed" with the OS error
 - **Invalid JSON response**: Falls back to returning the raw text as a chat message
+
+## Testing
+
+The AI API has comprehensive test coverage:
+
+- **Unit tests** (vitest): `parse-ai-response.test.ts`, `validate-astro-filename.test.ts`, `update-sidebar-nav.test.ts`
+- **E2E tests** (Playwright): `e2e/ai-chat.spec.ts` — tests the full chat modal flow with mocked API responses
