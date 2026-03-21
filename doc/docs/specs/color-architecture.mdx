@@ -1,0 +1,237 @@
+---
+sidebar_position: 2
+title: Color Architecture
+---
+
+# Color Architecture
+
+CSS Playground uses a three-tier color cascade with CSS custom properties. Colors flow from raw palette values through semantic assignments to component-level overrides — all controlled by the `--cssp-*` variable namespace.
+
+## Three-Tier Color Cascade
+
+### Tier 1 — Palette
+
+The raw palette is a set of 16 indexed colors (`--cssp-0` through `--cssp-15`). These are the foundational color values that all other tokens derive from.
+
+The ColorTweakPanel edits these directly, and presets swap the entire palette at once.
+
+### Tier 2 — Semantic
+
+Semantic tokens (`--cssp-bg`, `--cssp-accent`, etc.) map purpose to color. Components reference semantic tokens so that switching palettes updates the entire UI consistently.
+
+```css
+/* Defined in :root of tokens.css */
+:root {
+  --cssp-bg: #1e1e2e;
+  --cssp-fg: #cdd6f4;
+  --cssp-surface: #313244;
+  --cssp-muted: #6c7086;
+  --cssp-accent: #89b4fa;
+  --cssp-accent-hover: #b4d0fb;
+  --cssp-success: #a6e3a1;
+  --cssp-danger: #f38ba8;
+  --cssp-warning: #f9e2af;
+  --cssp-info: #89dceb;
+}
+```
+
+### Tier 3 — Component
+
+Component-specific overrides via scoped CSS. No predefined variables — components simply reassign Tier 2 variables locally when needed.
+
+```css
+/* Example: a card that uses info as its accent */
+.info-card {
+  --cssp-accent: var(--cssp-info);
+}
+```
+
+## CSS Variable Naming Convention
+
+All color variables use the `--cssp-*` prefix (CSS Playground):
+
+- `--cssp-{0-15}` — Palette indices
+- `--cssp-bg` — Background
+- `--cssp-fg` — Foreground
+- `--cssp-surface` — Elevated surface
+- `--cssp-muted` — Muted/secondary text
+- `--cssp-accent` — Primary interactive
+- `--cssp-accent-hover` — Accent hover state
+- `--cssp-success` — Success state
+- `--cssp-danger` — Danger/error state
+- `--cssp-warning` — Warning state
+- `--cssp-info` — Informational state
+
+The `@theme` block in `tokens.css` bridges these to Tailwind's `--color-*` namespace:
+
+```css
+@theme {
+  --color-bg: var(--cssp-bg);
+  --color-fg: var(--cssp-fg);
+  --color-surface: var(--cssp-surface);
+  /* ... */
+  --color-p0: var(--cssp-0);
+  --color-p1: var(--cssp-1);
+  /* ... */
+}
+```
+
+## Default Palette — Catppuccin Mocha
+
+The default theme is inspired by Catppuccin Mocha, a dark color scheme.
+
+### Palette Colors (p0–p15)
+
+| Index | Hex | Swatch | Description |
+|---|---|---|---|
+| p0 | `#11111b` | | Darkest (near-black) |
+| p1 | `#f38ba8` | | Red/pink |
+| p2 | `#a6e3a1` | | Green |
+| p3 | `#f9e2af` | | Yellow |
+| p4 | `#89b4fa` | | Blue (primary) |
+| p5 | `#f5c2e7` | | Pink |
+| p6 | `#94e2d5` | | Teal |
+| p7 | `#cdd6f4` | | Light text |
+| p8 | `#585b70` | | Dark muted |
+| p9 | `#f38ba8` | | Red (bright) |
+| p10 | `#a6e3a1` | | Green (bright) |
+| p11 | `#f9e2af` | | Yellow (bright) |
+| p12 | `#89b4fa` | | Blue (bright) |
+| p13 | `#f5c2e7` | | Pink (bright) |
+| p14 | `#94e2d5` | | Teal (bright) |
+| p15 | `#bac2de` | | Light gray |
+
+### Semantic Assignments
+
+| Token | Hex | Purpose |
+|---|---|---|
+| `--cssp-bg` | `#1e1e2e` | Page background |
+| `--cssp-fg` | `#cdd6f4` | Primary text |
+| `--cssp-surface` | `#313244` | Cards, sidebar, panels |
+| `--cssp-muted` | `#6c7086` | Secondary text |
+| `--cssp-accent` | `#89b4fa` | Links, buttons, active states |
+| `--cssp-accent-hover` | `#b4d0fb` | Accent hover |
+| `--cssp-success` | `#a6e3a1` | Success indicators |
+| `--cssp-danger` | `#f38ba8` | Errors, destructive actions |
+| `--cssp-warning` | `#f9e2af` | Warnings |
+| `--cssp-info` | `#89dceb` | Info messages |
+
+## Available Presets
+
+### Catppuccin Mocha (Default)
+
+Dark theme with pastel accents and warm undertones.
+
+| Semantic | Hex |
+|---|---|
+| BG | `#1e1e2e` |
+| FG | `#cdd6f4` |
+| Surface | `#313244` |
+| Muted | `#6c7086` |
+| Accent | `#89b4fa` |
+| Accent Hover | `#b4d0fb` |
+| Success | `#a6e3a1` |
+| Danger | `#f38ba8` |
+| Warning | `#f9e2af` |
+| Info | `#89dceb` |
+
+Palette: `#11111b` `#f38ba8` `#a6e3a1` `#f9e2af` `#89b4fa` `#f5c2e7` `#94e2d5` `#cdd6f4` `#585b70` `#f38ba8` `#a6e3a1` `#f9e2af` `#89b4fa` `#f5c2e7` `#94e2d5` `#bac2de`
+
+### Dracula
+
+Dark theme with vivid, saturated colors.
+
+| Semantic | Hex |
+|---|---|
+| BG | `#282a36` |
+| FG | `#f8f8f2` |
+| Surface | `#21222c` |
+| Muted | `#86878b` |
+| Accent | `#8be9fd` |
+| Accent Hover | `#a4ffff` |
+| Success | `#50fa7b` |
+| Danger | `#ff5555` |
+| Warning | `#f1fa8c` |
+| Info | `#bd93f9` |
+
+Palette: `#21222c` `#ff5555` `#50fa7b` `#f1fa8c` `#bd93f9` `#ff79c6` `#8be9fd` `#f8f8f2` `#6272a4` `#ff6e6e` `#69ff94` `#ffffa5` `#d6acff` `#ff92df` `#a4ffff` `#ffffff`
+
+### Nord
+
+Dark theme with cool, muted Scandinavian-inspired colors.
+
+| Semantic | Hex |
+|---|---|
+| BG | `#2e3440` |
+| FG | `#d8dee9` |
+| Surface | `#3b4252` |
+| Muted | `#616e88` |
+| Accent | `#88c0d0` |
+| Accent Hover | `#8fbcbb` |
+| Success | `#a3be8c` |
+| Danger | `#bf616a` |
+| Warning | `#ebcb8b` |
+| Info | `#81a1c1` |
+
+Palette: `#2e3440` `#bf616a` `#a3be8c` `#ebcb8b` `#81a1c1` `#b48ead` `#88c0d0` `#e5e9f0` `#4c566a` `#bf616a` `#a3be8c` `#ebcb8b` `#81a1c1` `#b48ead` `#88c0d0` `#eceff4`
+
+## How ColorTweakPanel Updates Colors
+
+The panel calls `applyToDocument()` on every change:
+
+```typescript
+function applyToDocument(state: TweakState) {
+  const el = document.documentElement;
+  // Set palette variables
+  state.palette.forEach((color, i) => {
+    el.style.setProperty(`--cssp-${i}`, color);
+  });
+  // Set semantic variables
+  SEMANTIC_FIELDS.forEach(({ key, cssVar }) => {
+    el.style.setProperty(cssVar, state[key]);
+  });
+}
+```
+
+This sets properties directly on `document.documentElement.style`, which overrides the values from `tokens.css`. The change is instant and affects every element on the page that references `--cssp-*` variables.
+
+State is persisted to localStorage under the key `cssp-tweak-state`.
+
+## How to Create a New Preset
+
+To add a new color preset:
+
+1. Open `src/components/color-tweak-panel.tsx`
+2. Add a new entry to the `PRESETS` object:
+
+```typescript
+const PRESETS: Record<string, TweakState> = {
+  // ... existing presets ...
+  "My Theme": {
+    palette: [
+      "#000000", "#ff0000", "#00ff00", "#ffff00",
+      "#0000ff", "#ff00ff", "#00ffff", "#ffffff",
+      "#808080", "#ff0000", "#00ff00", "#ffff00",
+      "#0000ff", "#ff00ff", "#00ffff", "#c0c0c0",
+    ],
+    bg: "#000000",
+    fg: "#ffffff",
+    surface: "#1a1a1a",
+    muted: "#808080",
+    accent: "#0000ff",
+    accentHover: "#3333ff",
+    success: "#00ff00",
+    danger: "#ff0000",
+    warning: "#ffff00",
+    info: "#00ffff",
+  },
+};
+```
+
+3. The preset will automatically appear in the ColorTweakPanel's dropdown selector
+
+Requirements for a preset:
+
+- `palette`: Array of exactly 16 hex color strings
+- All 10 semantic fields must be set: `bg`, `fg`, `surface`, `muted`, `accent`, `accentHover`, `success`, `danger`, `warning`, `info`
+- All values must be valid CSS hex colors (e.g., `#1e1e2e`)
