@@ -11,10 +11,9 @@ CSS Playground is an AI-driven app for generating and previewing UI component pa
 
 Built with Astro 5, React 19, and Tailwind CSS v4, it provides:
 
-- A library of pre-built UI component patterns (headers, cards, forms, tabs, toasts, footers)
 - An AI chat interface that generates new pattern categories on demand
-- A floating color tweak panel with preset themes
-- Iframe-based live previews with responsive viewport switching
+- Two floating tweak panels: app color tweaker (HSL picker + palette selector) and demo token tweaker (color/typography/spacing tabs)
+- Iframe-based live previews with responsive viewport switching and live token updates
 - An optional Tauri desktop wrapper
 
 ## Quick Start
@@ -65,9 +64,9 @@ Click the **AI Chat** button at the bottom of the sidebar to open the chat modal
 
 1. Type a request like "Make 10 breadcrumb patterns" or "Create 8 sidebar navigation variations"
 2. The AI generates patterns using the project's design token system
-3. Pattern files (`.astro` pages) are written to disk automatically
-4. The sidebar navigation is updated with the new category
-5. Click **Reload page to see results** to view the new patterns
+3. The chat shows a success message with the generated file list
+4. Click **Apply & Reload** to write the pattern files to disk and update the sidebar
+5. The page reloads with the new patterns visible
 
 ### What the AI Knows
 
@@ -78,7 +77,7 @@ The AI is given the full token variable reference and strict instructions to nev
 - One request at a time (rate limited to 1 concurrent request)
 - Message length: 4000 characters max
 - Conversation history: 20 messages max
-- Response timeout: 60 seconds
+- Response timeout: 480 seconds
 
 ## Using the Color Tweak Panel
 
@@ -91,13 +90,35 @@ Click the circular gradient button in the top-right corner of the page.
 ### Features
 
 - **Preset themes**: Switch between Catppuccin Mocha (default), Dracula, and Nord
-- **Palette editing**: Adjust all 16 raw palette colors (p0–p15) via color pickers in a 4×4 grid
-- **Semantic editing**: Adjust the 10 semantic color tokens (BG, FG, Surface, Muted, Accent, Accent Hover, Success, Danger, Warning, Info)
+- **Palette editing**: Adjust all 16 raw palette colors (p0-p15) via clickable swatches in an 8x2 grid. Clicking a swatch opens an HSL picker with hue, saturation, and lightness sliders
+- **Base mapping**: Map BG and FG to palette indices using dropdown selectors
+- **Semantic token mapping**: Map all semantic tokens (Surface, Muted, Accent, etc.) to palette indices using PaletteSelector dropdowns, enforcing the palette-to-semantic relationship
 - **Drag to reposition**: Grab the title bar to move the panel anywhere on screen
-- **Persistent state**: Your color choices and panel position are saved to localStorage
+- **Persistent state**: Your color choices are saved to localStorage
 
 ### How It Works
 
 The panel updates CSS custom properties (`--cssp-*`) on `document.documentElement.style` in real time. Since all components and patterns reference these variables, every element on the page responds instantly to color changes.
 
 Click **Reset** to restore the current preset's default colors.
+
+## Using the Demo Tweak Panel
+
+The demo tweak panel controls the design tokens used inside HtmlPreview iframes — the actual pattern demos.
+
+### How to Open
+
+Click the grid icon button in the top-right corner (next to the color tweak button).
+
+### Features
+
+- **Three tabs**: Color, Typography, and Spacing
+- **Color tab**: Clickable swatches for all demo color tokens (accent, fg, bg, border, status colors). Each opens an HSL picker popover
+- **Typography tab**: Range sliders for font size tokens (--font-sm, --font-md, --font-lg)
+- **Spacing tab**: Range sliders for spacing tokens (--space-xs, --space-sm, --space-md, --space-lg)
+- **Live updates**: Changes apply instantly to ALL pattern iframes on the page
+- **Persistent state**: Tweaks are saved to localStorage and restored on reload
+
+### How It Works
+
+The panel uses an iframe registry (`src/lib/iframe-registry.ts`) to track all HtmlPreview iframes. When you change a token value, it iterates all registered iframes and sets the CSS custom property via `style.setProperty()` on each iframe's document root.

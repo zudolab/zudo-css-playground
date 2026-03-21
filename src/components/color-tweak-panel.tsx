@@ -1,20 +1,31 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import HslPicker from "./hsl-picker";
+import PaletteSelector from "./palette-selector";
 
 interface TweakState {
   palette: string[];
-  bg: string;
-  fg: string;
-  surface: string;
-  muted: string;
-  accent: string;
-  accentHover: string;
-  success: string;
-  danger: string;
-  warning: string;
-  info: string;
+  semanticMappings: Record<string, number>;
 }
 
-const PRESETS: Record<string, TweakState> = {
+const DEFAULT_SEMANTIC_MAPPINGS: Record<string, number> = {
+  bg: 9,
+  fg: 7,
+  surface: 10,
+  muted: 13,
+  accent: 4,
+  accentHover: 11,
+  success: 2,
+  danger: 1,
+  warning: 3,
+  info: 12,
+};
+
+interface PresetDef {
+  palette: string[];
+  semanticMappings: Record<string, number>;
+}
+
+const PRESETS: Record<string, PresetDef> = {
   "Catppuccin Mocha": {
     palette: [
       "#11111b",
@@ -26,24 +37,26 @@ const PRESETS: Record<string, TweakState> = {
       "#94e2d5",
       "#cdd6f4",
       "#585b70",
-      "#f38ba8",
-      "#a6e3a1",
-      "#f9e2af",
-      "#89b4fa",
-      "#f5c2e7",
+      "#1e1e2e",
+      "#313244",
+      "#b4d0fb",
+      "#89dceb",
+      "#6c7086",
       "#94e2d5",
       "#bac2de",
     ],
-    bg: "#1e1e2e",
-    fg: "#cdd6f4",
-    surface: "#313244",
-    muted: "#6c7086",
-    accent: "#89b4fa",
-    accentHover: "#b4d0fb",
-    success: "#a6e3a1",
-    danger: "#f38ba8",
-    warning: "#f9e2af",
-    info: "#89dceb",
+    semanticMappings: {
+      bg: 9,
+      fg: 7,
+      surface: 10,
+      muted: 13,
+      accent: 4,
+      accentHover: 11,
+      success: 2,
+      danger: 1,
+      warning: 3,
+      info: 12,
+    },
   },
   Dracula: {
     palette: [
@@ -56,24 +69,26 @@ const PRESETS: Record<string, TweakState> = {
       "#8be9fd",
       "#f8f8f2",
       "#6272a4",
-      "#ff6e6e",
-      "#69ff94",
-      "#ffffa5",
+      "#282a36",
+      "#86878b",
+      "#a4ffff",
       "#d6acff",
       "#ff92df",
-      "#a4ffff",
+      "#69ff94",
       "#ffffff",
     ],
-    bg: "#282a36",
-    fg: "#f8f8f2",
-    surface: "#21222c",
-    muted: "#86878b",
-    accent: "#8be9fd",
-    accentHover: "#a4ffff",
-    success: "#50fa7b",
-    danger: "#ff5555",
-    warning: "#f1fa8c",
-    info: "#bd93f9",
+    semanticMappings: {
+      bg: 9,
+      fg: 7,
+      surface: 0,
+      muted: 10,
+      accent: 6,
+      accentHover: 11,
+      success: 2,
+      danger: 1,
+      warning: 3,
+      info: 4,
+    },
   },
   Nord: {
     palette: [
@@ -86,33 +101,34 @@ const PRESETS: Record<string, TweakState> = {
       "#88c0d0",
       "#e5e9f0",
       "#4c566a",
-      "#bf616a",
-      "#a3be8c",
-      "#ebcb8b",
-      "#81a1c1",
+      "#3b4252",
+      "#616e88",
+      "#8fbcbb",
+      "#d8dee9",
       "#b48ead",
       "#88c0d0",
       "#eceff4",
     ],
-    bg: "#2e3440",
-    fg: "#d8dee9",
-    surface: "#3b4252",
-    muted: "#616e88",
-    accent: "#88c0d0",
-    accentHover: "#8fbcbb",
-    success: "#a3be8c",
-    danger: "#bf616a",
-    warning: "#ebcb8b",
-    info: "#81a1c1",
+    semanticMappings: {
+      bg: 0,
+      fg: 12,
+      surface: 9,
+      muted: 10,
+      accent: 6,
+      accentHover: 11,
+      success: 2,
+      danger: 1,
+      warning: 3,
+      info: 4,
+    },
   },
 };
 
 const STORAGE_KEY = "cssp-tweak-state";
-// Position is no longer persisted — panel centers on each open
 const PRESET_KEY = "cssp-tweak-preset";
 
 const SEMANTIC_FIELDS: {
-  key: keyof Omit<TweakState, "palette">;
+  key: string;
   label: string;
   cssVar: string;
 }[] = [
@@ -128,18 +144,39 @@ const SEMANTIC_FIELDS: {
   { key: "info", label: "Info", cssVar: "--cssp-info" },
 ];
 
+const BASE_FIELDS = SEMANTIC_FIELDS.filter(
+  (f) => f.key === "bg" || f.key === "fg",
+);
+const TOKEN_FIELDS = SEMANTIC_FIELDS.filter(
+  (f) => f.key !== "bg" && f.key !== "fg",
+);
+
+const PANEL_WIDTH = 420;
+
 function loadState(): { state: TweakState; preset: string } {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     const preset = localStorage.getItem(PRESET_KEY) || "Catppuccin Mocha";
     if (saved) {
-      return { state: JSON.parse(saved), preset };
+      const parsed = JSON.parse(saved);
+      // Migration: convert old format (individual semantic keys) to new format
+      if (parsed.palette && !parsed.semanticMappings) {
+        const mappings = { ...DEFAULT_SEMANTIC_MAPPINGS };
+        return {
+          state: { palette: parsed.palette, semanticMappings: mappings },
+          preset,
+        };
+      }
+      return { state: parsed, preset };
     }
   } catch {
     // ignore
   }
   return {
-    state: { ...PRESETS["Catppuccin Mocha"] },
+    state: {
+      palette: [...PRESETS["Catppuccin Mocha"].palette],
+      semanticMappings: { ...PRESETS["Catppuccin Mocha"].semanticMappings },
+    },
     preset: "Catppuccin Mocha",
   };
 }
@@ -147,7 +184,7 @@ function loadState(): { state: TweakState; preset: string } {
 function centerPosition(): { x: number; y: number } {
   if (typeof window === "undefined") return { x: 0, y: 0 };
   return {
-    x: Math.max(0, (window.innerWidth - 280) / 2),
+    x: Math.max(0, (window.innerWidth - PANEL_WIDTH) / 2),
     y: Math.max(0, (window.innerHeight - 500) / 2),
   };
 }
@@ -158,7 +195,9 @@ function applyToDocument(state: TweakState) {
     el.style.setProperty(`--cssp-${i}`, color);
   });
   SEMANTIC_FIELDS.forEach(({ key, cssVar }) => {
-    el.style.setProperty(cssVar, state[key]);
+    const paletteIndex =
+      state.semanticMappings[key] ?? DEFAULT_SEMANTIC_MAPPINGS[key] ?? 0;
+    el.style.setProperty(cssVar, state.palette[paletteIndex] ?? "#000000");
   });
 }
 
@@ -166,6 +205,63 @@ function loadInitial() {
   const { state, preset } = loadState();
   return { state, preset };
 }
+
+// --- Palette swatch with HSL picker ---
+
+function PaletteSwatch({
+  color,
+  index,
+  onChange,
+  mutedColor,
+}: {
+  color: string;
+  index: number;
+  onChange: (hex: string) => void;
+  mutedColor: string;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const handleClose = useCallback(() => setIsOpen(false), []);
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 3,
+      }}
+    >
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        title={`p${index}: ${color}`}
+        style={{
+          width: "3rem",
+          height: "3rem",
+          backgroundColor: color,
+          border: "1px solid rgba(255,255,255,0.12)",
+          borderRadius: 4,
+          cursor: "pointer",
+          padding: 0,
+        }}
+      />
+      {isOpen && (
+        <HslPicker
+          color={color}
+          onChange={onChange}
+          onClose={handleClose}
+          anchorEl={buttonRef.current}
+        />
+      )}
+      <span style={{ fontSize: 10, color: mutedColor, lineHeight: 1 }}>
+        p{index}
+      </span>
+    </div>
+  );
+}
+
+// --- Main Panel ---
 
 export default function ColorTweakPanel() {
   const [initial] = useState(loadInitial);
@@ -194,7 +290,7 @@ export default function ColorTweakPanel() {
     }
   }, [state]);
 
-  // Drag handlers — only attach mousemove/mouseup during active drag
+  // Drag handlers
   const onMouseDown = useCallback(
     (e: React.MouseEvent) => {
       dragging.current = true;
@@ -211,7 +307,7 @@ export default function ColorTweakPanel() {
             0,
             Math.min(
               ev.clientX - dragOffset.current.x,
-              window.innerWidth - 280,
+              window.innerWidth - PANEL_WIDTH,
             ),
           ),
           y: Math.max(
@@ -242,18 +338,21 @@ export default function ColorTweakPanel() {
     });
   };
 
-  const updateSemantic = (
-    key: keyof Omit<TweakState, "palette">,
-    color: string,
-  ) => {
-    setState((prev) => ({ ...prev, [key]: color }));
+  const updateSemanticMapping = (key: string, paletteIndex: number) => {
+    setState((prev) => ({
+      ...prev,
+      semanticMappings: { ...prev.semanticMappings, [key]: paletteIndex },
+    }));
   };
 
   const applyPreset = (name: string) => {
     const p = PRESETS[name];
     if (!p) return;
     setPreset(name);
-    setState({ ...p });
+    setState({
+      palette: [...p.palette],
+      semanticMappings: { ...p.semanticMappings },
+    });
     try {
       localStorage.setItem(PRESET_KEY, name);
     } catch {
@@ -264,6 +363,14 @@ export default function ColorTweakPanel() {
   const resetToPreset = () => {
     applyPreset(preset);
   };
+
+  // Derive colors for panel styling from current state
+  const bgColor = state.palette[state.semanticMappings.bg ?? 0] ?? "#1e1e2e";
+  const fgColor = state.palette[state.semanticMappings.fg ?? 7] ?? "#cdd6f4";
+  const surfaceColor =
+    state.palette[state.semanticMappings.surface ?? 0] ?? "#313244";
+  const mutedColor =
+    state.palette[state.semanticMappings.muted ?? 8] ?? "#6c7086";
 
   // Toggle button (always visible)
   const toggleButton = (
@@ -310,6 +417,15 @@ export default function ColorTweakPanel() {
 
   if (!open) return toggleButton;
 
+  const sectionHeadingStyle: React.CSSProperties = {
+    fontSize: 10,
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+    color: mutedColor,
+    marginBottom: 6,
+    fontWeight: 600,
+  };
+
   return (
     <>
       {toggleButton}
@@ -320,16 +436,16 @@ export default function ColorTweakPanel() {
           left: position.x,
           top: position.y,
           zIndex: 9999,
-          width: 280,
+          width: PANEL_WIDTH,
           maxHeight: "calc(100vh - 32px)",
           overflowY: "auto",
-          background: state.surface,
-          border: `1px solid rgba(255,255,255,0.1)`,
+          background: surfaceColor,
+          border: "1px solid rgba(255,255,255,0.1)",
           borderRadius: 8,
           boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
           fontFamily: "system-ui, sans-serif",
           fontSize: 12,
-          color: state.fg,
+          color: fgColor,
         }}
       >
         {/* Title bar (draggable) */}
@@ -352,7 +468,7 @@ export default function ColorTweakPanel() {
             style={{
               background: "none",
               border: "none",
-              color: state.muted,
+              color: mutedColor,
               cursor: "pointer",
               fontSize: 16,
               lineHeight: 1,
@@ -378,9 +494,9 @@ export default function ColorTweakPanel() {
               onChange={(e) => applyPreset(e.target.value)}
               style={{
                 flex: 1,
-                background: state.bg,
-                color: state.fg,
-                border: `1px solid rgba(255,255,255,0.1)`,
+                background: bgColor,
+                color: fgColor,
+                border: "1px solid rgba(255,255,255,0.1)",
                 borderRadius: 4,
                 padding: "3px 6px",
                 fontSize: 11,
@@ -396,9 +512,9 @@ export default function ColorTweakPanel() {
             <button
               onClick={resetToPreset}
               style={{
-                background: state.bg,
-                color: state.muted,
-                border: `1px solid rgba(255,255,255,0.1)`,
+                background: bgColor,
+                color: mutedColor,
+                border: "1px solid rgba(255,255,255,0.1)",
                 borderRadius: 4,
                 padding: "3px 8px",
                 fontSize: 11,
@@ -410,106 +526,76 @@ export default function ColorTweakPanel() {
             </button>
           </div>
 
-          {/* Palette section */}
-          <div style={{ marginBottom: 10 }}>
-            <div
-              style={{
-                fontSize: 10,
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                color: state.muted,
-                marginBottom: 6,
-                fontWeight: 600,
-              }}
-            >
-              Palette (p0–p15)
-            </div>
+          {/* Section 1: PALETTE (p0-p15) */}
+          <div style={{ marginBottom: 12 }}>
+            <div style={sectionHeadingStyle}>Palette (p0-p15)</div>
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(4, 1fr)",
+                gridTemplateColumns: "repeat(8, 1fr)",
                 gap: 4,
               }}
             >
               {state.palette.map((color, i) => (
-                <label
+                <PaletteSwatch
                   key={i}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: 2,
-                  }}
-                >
-                  <input
-                    type="color"
-                    value={color}
-                    onChange={(e) => updatePalette(i, e.target.value)}
-                    style={{
-                      width: 24,
-                      height: 24,
-                      border: "1px solid rgba(255,255,255,0.12)",
-                      borderRadius: 3,
-                      padding: 0,
-                      cursor: "pointer",
-                      background: "none",
-                    }}
-                  />
-                  <span style={{ fontSize: 9, color: state.muted }}>p{i}</span>
-                </label>
+                  color={color}
+                  index={i}
+                  onChange={(hex) => updatePalette(i, hex)}
+                  mutedColor={mutedColor}
+                />
               ))}
             </div>
           </div>
 
-          {/* Semantic section */}
-          <div>
-            <div
-              style={{
-                fontSize: 10,
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                color: state.muted,
-                marginBottom: 6,
-                fontWeight: 600,
-              }}
-            >
-              Semantic
-            </div>
+          {/* Section 2: BASE (bg, fg) */}
+          <div style={{ marginBottom: 12 }}>
+            <div style={sectionHeadingStyle}>Base</div>
             <div
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(2, 1fr)",
-                gap: 4,
+                gap: 6,
               }}
             >
-              {SEMANTIC_FIELDS.map(({ key, label }) => (
-                <label
+              {BASE_FIELDS.map(({ key, label }) => (
+                <PaletteSelector
                   key={key}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                  }}
-                >
-                  <input
-                    type="color"
-                    value={state[key]}
-                    onChange={(e) => updateSemantic(key, e.target.value)}
-                    style={{
-                      width: 24,
-                      height: 24,
-                      border: "1px solid rgba(255,255,255,0.12)",
-                      borderRadius: 3,
-                      padding: 0,
-                      cursor: "pointer",
-                      background: "none",
-                      flexShrink: 0,
-                    }}
-                  />
-                  <span style={{ fontSize: 11, color: state.muted }}>
-                    {label}
-                  </span>
-                </label>
+                  label={label}
+                  value={
+                    state.semanticMappings[key] ??
+                    DEFAULT_SEMANTIC_MAPPINGS[key] ??
+                    0
+                  }
+                  palette={state.palette}
+                  onChange={(index) => updateSemanticMapping(key, index)}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Section 3: SEMANTIC TOKENS */}
+          <div>
+            <div style={sectionHeadingStyle}>Semantic Tokens</div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: 6,
+              }}
+            >
+              {TOKEN_FIELDS.map(({ key, label }) => (
+                <PaletteSelector
+                  key={key}
+                  label={label}
+                  value={
+                    state.semanticMappings[key] ??
+                    DEFAULT_SEMANTIC_MAPPINGS[key] ??
+                    0
+                  }
+                  palette={state.palette}
+                  onChange={(index) => updateSemanticMapping(key, index)}
+                />
               ))}
             </div>
           </div>

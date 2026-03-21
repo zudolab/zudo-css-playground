@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { generateBaseTokensCss } from "../lib/demo-tokens";
+import { registerIframe, unregisterIframe } from "../lib/iframe-registry";
 
 type Viewport = "mobile" | "tablet" | "full";
 
@@ -7,33 +9,6 @@ const viewportWidths: Record<Viewport, string> = {
   tablet: "768px",
   full: "100%",
 };
-
-/** Shared design tokens injected into every preview iframe */
-const BASE_TOKENS = `
-:root {
-  --space-xs: 8px;
-  --space-sm: 12px;
-  --space-md: 20px;
-  --space-lg: 32px;
-  --radius: 8px;
-  --accent: hsl(220 70% 50%);
-  --accent-hover: hsl(220 70% 42%);
-  --fg: hsl(220 25% 15%);
-  --fg-muted: hsl(220 10% 40%);
-  --bg: hsl(0 0% 100%);
-  --bg-subtle: hsl(220 15% 96%);
-  --border: hsl(220 15% 85%);
-  --success: hsl(142 71% 45%);
-  --danger: hsl(0 84% 60%);
-  --warning: hsl(45 93% 47%);
-  --info: hsl(220 70% 50%);
-  --font-sm: 0.85rem;
-  --font-md: 1rem;
-  --font-lg: 1.1rem;
-  --shadow: 0 1px 3px hsl(220 25% 15% / 0.1);
-  --shadow-strong: 0 4px 12px hsl(220 25% 15% / 0.15);
-  --focus-ring: 0 0 0 2px hsl(220 70% 50% / 0.25);
-}`;
 
 interface Props {
   html: string;
@@ -65,7 +40,7 @@ export default function HtmlPreview({
 body { font-family: system-ui, sans-serif; }
 input, button, textarea, select { font-family: inherit; }
 :focus-visible { outline: 2px solid var(--accent, hsl(220 70% 50%)); outline-offset: 2px; }
-${BASE_TOKENS}
+${generateBaseTokensCss()}
 ${css}
 </style>
 </head>
@@ -91,9 +66,15 @@ ${css}
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe) return;
-    const handleLoad = () => measureHeight();
+    const handleLoad = () => {
+      registerIframe(iframe);
+      measureHeight();
+    };
     iframe.addEventListener("load", handleLoad);
-    return () => iframe.removeEventListener("load", handleLoad);
+    return () => {
+      iframe.removeEventListener("load", handleLoad);
+      unregisterIframe(iframe);
+    };
   }, [measureHeight]);
 
   const viewportButtons: { key: Viewport; label: string }[] = [

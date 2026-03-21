@@ -3,5 +3,14 @@
   "compilerOptions": {
     "jsx": "react-jsx"
   },
-  "exclude": ["doc", "worktrees", "node_modules", "dist"]
+  "exclude": [
+    "doc",
+    "worktrees",
+    "node_modules",
+    "dist",
+    "e2e",
+    "src/**/*.test.ts",
+    "playwright.config.ts",
+    "vitest.config.ts"
+  ]
 }

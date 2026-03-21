@@ -215,6 +215,55 @@ Three localStorage keys:
 
 The `applyToDocument()` function sets CSS custom properties directly on `document.documentElement.style`. Since all page styles reference `--cssp-*` variables, changes propagate instantly.
 
+## DemoTweakPanel
+
+**File**: `src/components/demo-tweak-panel.tsx`
+
+Floating, draggable panel for live-editing demo tokens inside HtmlPreview iframes.
+
+### Toggle Button
+
+A fixed circular button (36x36px) at `top: 12px, right: 56px` (offset from the ColorTweakPanel button). Gradient background (`#f9e2af -> #94e2d5 -> #89b4fa`) with a ruler/grid SVG icon.
+
+### Panel Layout
+
+- **Position**: Fixed, centered on viewport when opened
+- **Size**: 280px wide, max-height `calc(100vh - 32px)` with vertical scroll
+- **Drag**: Title bar is draggable, constrained to viewport bounds
+
+### Tabbed UI
+
+Three tabs control which token category is shown:
+
+| Tab            | Controls                                               | Widgets                                                  |
+| -------------- | ------------------------------------------------------ | -------------------------------------------------------- |
+| **Color**      | `--accent`, `--fg`, `--bg`, `--border`, status colors  | Clickable color swatches that open an HSL picker popover |
+| **Typography** | `--font-sm`, `--font-md`, `--font-lg`                  | Text input + range slider (0.5-3rem, step 0.05)          |
+| **Spacing**    | `--space-xs`, `--space-sm`, `--space-md`, `--space-lg` | Text input + range slider (0-64px, step 1)               |
+
+### Color Tab Sections
+
+- **Palette Colors**: `--accent`, `--accent-hover`, `--fg`, `--fg-muted`, `--bg`, `--bg-subtle`, `--border`
+- **Status Colors**: `--success`, `--danger`, `--warning`, `--info`
+
+Clicking a swatch opens the `HslPicker` popover component for fine-grained HSL editing.
+
+### Iframe Communication
+
+Token changes are applied to all registered HtmlPreview iframes via the iframe registry (`src/lib/iframe-registry.ts`):
+
+- `applyToAllIframes(variable, cssValue)` — updates a single token
+- `setGlobalOverrides(overrides)` — applies all overrides (used on mount)
+- `resetGlobalOverrides()` — removes all overrides (used by Reset button)
+
+### Persistence
+
+| Key                | Purpose                                                                    |
+| ------------------ | -------------------------------------------------------------------------- |
+| `demo-tweak-state` | Full state (colors as hex, typography as rem values, spacing as px values) |
+
+The **Reset to Defaults** button clears localStorage and restores all tokens to their default values from `demoTokenConfig`.
+
 ## AiChatModal
 
 **File**: `src/components/ai-chat-modal.tsx`

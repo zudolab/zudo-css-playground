@@ -11,24 +11,34 @@ title: Project Structure
 zudo-css-playground/
 ├── src/
 │   ├── components/          # React islands (client:load / client:visible)
-│   │   ├── ai-chat-modal.tsx
-│   │   ├── color-tweak-panel.tsx
-│   │   ├── html-preview.tsx
+│   │   ├── ai-chat-modal.tsx    # AI chat dialog with markdown rendering
+│   │   ├── color-tweak-panel.tsx # App token tweaker (HSL picker + palette selector)
+│   │   ├── demo-tweak-panel.tsx  # Demo token tweaker (color/typography/spacing tabs)
+│   │   ├── hsl-picker.tsx        # Shared HSL color picker popover
+│   │   ├── html-preview.tsx      # Iframe-based pattern preview
+│   │   ├── palette-selector.tsx  # Palette grid dropdown selector
 │   │   └── sidebar-nav.tsx
 │   ├── layouts/
 │   │   └── base-layout.astro   # Main page wrapper
+│   ├── lib/                     # Shared library modules
+│   │   ├── color-convert.ts      # hexToHsl, hslToHex, hslToCssString
+│   │   ├── demo-tokens.ts        # Demo token config + generateBaseTokensCss()
+│   │   ├── iframe-registry.ts    # Live iframe token updates
+│   │   ├── parse-ai-response.ts  # AI response JSON parsing
+│   │   ├── popover-position.ts   # Viewport-aware popover positioning
+│   │   ├── update-sidebar-nav.ts # Sidebar categories manipulation
+│   │   └── validate-astro-filename.ts
 │   ├── pages/
 │   │   ├── api/
-│   │   │   └── ai-chat.ts      # POST /api/ai-chat endpoint
-│   │   ├── index.astro          # Home page (category grid)
-│   │   ├── headers.astro        # 8 header patterns
-│   │   ├── cards.astro          # 8 card patterns
-│   │   ├── forms.astro          # 6 form patterns
-│   │   ├── tabs.astro           # 6 tab patterns
-│   │   ├── toasts.astro         # 4 toast patterns
-│   │   └── footers.astro        # 4 footer patterns
-│   └── styles/
-│       └── tokens.css           # Design token definitions
+│   │   │   ├── ai-chat.ts       # POST /api/ai-chat — generates patterns
+│   │   │   └── ai-chat-apply.ts # POST /api/ai-chat-apply — writes files
+│   │   └── index.astro          # Home page
+│   ├── styles/
+│   │   └── tokens.css           # App design token definitions + AI chat markdown styles
+│   └── utils/
+│       └── render-markdown.ts   # Lightweight markdown-to-HTML renderer
+├── e2e/                         # Playwright e2e tests
+│   └── ai-chat.spec.ts
 ├── src-tauri/                   # Tauri desktop wrapper (optional)
 │   ├── src/
 │   │   └── main.rs              # App entry, sidecar management
@@ -83,10 +93,10 @@ Key choices:
 
 Astro's island architecture means React components only hydrate where needed:
 
-| Directive | Used By | Reason |
-|---|---|---|
-| `client:load` | SidebarNav, ColorTweakPanel, AiChatModal | Interactive from page load |
-| `client:visible` | HtmlPreview | Hydrates when scrolled into view (performance) |
+| Directive        | Used By                                                  | Reason                                         |
+| ---------------- | -------------------------------------------------------- | ---------------------------------------------- |
+| `client:load`    | SidebarNav, ColorTweakPanel, DemoTweakPanel, AiChatModal | Interactive from page load                     |
+| `client:visible` | HtmlPreview                                              | Hydrates when scrolled into view (performance) |
 
 ## Doc Site — Docusaurus
 
@@ -154,13 +164,12 @@ cargo tauri build
 │  │  │ button  │  │                          │   │  │
 │  │  └─────────┘  └──────────────────────────┘   │  │
 │  │                                               │  │
-│  │  ┌──────────────┐  ┌─────────────────────┐   │  │
-│  │  │ ColorTweak   │  │ AiChatModal         │   │  │
-│  │  │ Panel        │  │ → POST /api/ai-chat │   │  │
-│  │  │ (floating)   │  │ → claude CLI        │   │  │
-│  │  └──────────────┘  │ → write .astro file │   │  │
-│  │                     │ → update sidebar    │   │  │
-│  │                     └─────────────────────┘   │  │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────────┐  │  │
+│  │  │ Color    │ │ Demo     │ │ AiChatModal  │  │  │
+│  │  │ Tweak    │ │ Tweak    │ │ → ai-chat    │  │  │
+│  │  │ Panel    │ │ Panel    │ │ → ai-apply   │  │  │
+│  │  │ (cssp-)  │ │ (iframe) │ │ → reload     │  │  │
+│  │  └──────────┘ └──────────┘ └──────────────┘  │  │
 │  └───────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────┘
 
@@ -170,4 +179,4 @@ cargo tauri build
   └───────────────────────┘
 ```
 
-All tokens are defined in `src/styles/tokens.css` and flow into both the Tailwind theme (for component styling) and the HtmlPreview `BASE_TOKENS` (for iframe demos).
+App tokens are defined in `src/styles/tokens.css` and flow into the Tailwind theme (for component styling). Demo tokens are defined in `src/lib/demo-tokens.ts` and injected into HtmlPreview iframes via `generateBaseTokensCss()`. The two token systems are independent — app tokens use `--cssp-*` prefix, demo tokens use simple names (`--accent`, `--fg`, `--space-xs`, etc.) scoped within iframes.

@@ -22,27 +22,27 @@ Spacing is split into horizontal (`hsp`) and vertical (`vsp`) scales. This separ
 
 ### Horizontal Spacing (hsp)
 
-| Token | Value | Pixels |
-|---|---|---|
-| `--spacing-hsp-2xs` | 0.25rem | 4px |
-| `--spacing-hsp-xs` | 0.375rem | 6px |
-| `--spacing-hsp-sm` | 0.5rem | 8px |
-| `--spacing-hsp-md` | 0.75rem | 12px |
-| `--spacing-hsp-lg` | 1rem | 16px |
-| `--spacing-hsp-xl` | 1.5rem | 24px |
-| `--spacing-hsp-2xl` | 2rem | 32px |
+| Token               | Value    | Pixels |
+| ------------------- | -------- | ------ |
+| `--spacing-hsp-2xs` | 0.25rem  | 4px    |
+| `--spacing-hsp-xs`  | 0.375rem | 6px    |
+| `--spacing-hsp-sm`  | 0.5rem   | 8px    |
+| `--spacing-hsp-md`  | 0.75rem  | 12px   |
+| `--spacing-hsp-lg`  | 1rem     | 16px   |
+| `--spacing-hsp-xl`  | 1.5rem   | 24px   |
+| `--spacing-hsp-2xl` | 2rem     | 32px   |
 
 ### Vertical Spacing (vsp)
 
-| Token | Value | Pixels |
-|---|---|---|
-| `--spacing-vsp-2xs` | 0.25rem | 4px |
-| `--spacing-vsp-xs` | 0.5rem | 8px |
-| `--spacing-vsp-sm` | 0.75rem | 12px |
-| `--spacing-vsp-md` | 1rem | 16px |
-| `--spacing-vsp-lg` | 1.5rem | 24px |
-| `--spacing-vsp-xl` | 2rem | 32px |
-| `--spacing-vsp-2xl` | 3rem | 48px |
+| Token               | Value   | Pixels |
+| ------------------- | ------- | ------ |
+| `--spacing-vsp-2xs` | 0.25rem | 4px    |
+| `--spacing-vsp-xs`  | 0.5rem  | 8px    |
+| `--spacing-vsp-sm`  | 0.75rem | 12px   |
+| `--spacing-vsp-md`  | 1rem    | 16px   |
+| `--spacing-vsp-lg`  | 1.5rem  | 24px   |
+| `--spacing-vsp-xl`  | 2rem    | 32px   |
+| `--spacing-vsp-2xl` | 3rem    | 48px   |
 
 ### Tailwind Usage
 
@@ -56,41 +56,41 @@ Colors use a three-tier architecture: raw palette → semantic → component.
 
 16 indexed colors (`--cssp-0` through `--cssp-15`) that form the raw color palette. These are the values the ColorTweakPanel edits directly.
 
-| Variable | Default (Catppuccin Mocha) | Role |
-|---|---|---|
-| `--cssp-0` | `#11111b` | Darkest (near-black) |
-| `--cssp-1` | `#f38ba8` | Red/pink |
-| `--cssp-2` | `#a6e3a1` | Green |
-| `--cssp-3` | `#f9e2af` | Yellow |
-| `--cssp-4` | `#89b4fa` | Blue (primary) |
-| `--cssp-5` | `#f5c2e7` | Pink |
-| `--cssp-6` | `#94e2d5` | Teal |
-| `--cssp-7` | `#cdd6f4` | Light text |
-| `--cssp-8` | `#585b70` | Dark muted |
-| `--cssp-9` | `#f38ba8` | Red (bright) |
-| `--cssp-10` | `#a6e3a1` | Green (bright) |
-| `--cssp-11` | `#f9e2af` | Yellow (bright) |
-| `--cssp-12` | `#89b4fa` | Blue (bright) |
-| `--cssp-13` | `#f5c2e7` | Pink (bright) |
-| `--cssp-14` | `#94e2d5` | Teal (bright) |
-| `--cssp-15` | `#bac2de` | Light gray |
+| Variable    | Default (Catppuccin Mocha) | Role                 |
+| ----------- | -------------------------- | -------------------- |
+| `--cssp-0`  | `#11111b`                  | Darkest (near-black) |
+| `--cssp-1`  | `#f38ba8`                  | Red/pink             |
+| `--cssp-2`  | `#a6e3a1`                  | Green                |
+| `--cssp-3`  | `#f9e2af`                  | Yellow               |
+| `--cssp-4`  | `#89b4fa`                  | Blue (primary)       |
+| `--cssp-5`  | `#f5c2e7`                  | Pink                 |
+| `--cssp-6`  | `#94e2d5`                  | Teal                 |
+| `--cssp-7`  | `#cdd6f4`                  | Light text           |
+| `--cssp-8`  | `#585b70`                  | Dark muted           |
+| `--cssp-9`  | `#f38ba8`                  | Red (bright)         |
+| `--cssp-10` | `#a6e3a1`                  | Green (bright)       |
+| `--cssp-11` | `#f9e2af`                  | Yellow (bright)      |
+| `--cssp-12` | `#89b4fa`                  | Blue (bright)        |
+| `--cssp-13` | `#f5c2e7`                  | Pink (bright)        |
+| `--cssp-14` | `#94e2d5`                  | Teal (bright)        |
+| `--cssp-15` | `#bac2de`                  | Light gray           |
 
 ### Tier 2 — Semantic (Purpose-Based)
 
 Semantic tokens give meaning to palette colors. Components and layouts reference these instead of raw palette indices.
 
-| Variable | Default | Purpose |
-|---|---|---|
-| `--cssp-bg` | `#1e1e2e` | Page background |
-| `--cssp-fg` | `#cdd6f4` | Primary text |
-| `--cssp-surface` | `#313244` | Elevated surfaces (cards, panels, sidebar) |
-| `--cssp-muted` | `#6c7086` | Secondary/disabled text |
-| `--cssp-accent` | `#89b4fa` | Primary actions, links, interactive elements |
-| `--cssp-accent-hover` | `#b4d0fb` | Accent hover state |
-| `--cssp-success` | `#a6e3a1` | Success messages and indicators |
-| `--cssp-danger` | `#f38ba8` | Errors, destructive actions |
-| `--cssp-warning` | `#f9e2af` | Warnings, caution states |
-| `--cssp-info` | `#89dceb` | Informational messages |
+| Variable              | Default   | Purpose                                      |
+| --------------------- | --------- | -------------------------------------------- |
+| `--cssp-bg`           | `#1e1e2e` | Page background                              |
+| `--cssp-fg`           | `#cdd6f4` | Primary text                                 |
+| `--cssp-surface`      | `#313244` | Elevated surfaces (cards, panels, sidebar)   |
+| `--cssp-muted`        | `#6c7086` | Secondary/disabled text                      |
+| `--cssp-accent`       | `#89b4fa` | Primary actions, links, interactive elements |
+| `--cssp-accent-hover` | `#b4d0fb` | Accent hover state                           |
+| `--cssp-success`      | `#a6e3a1` | Success messages and indicators              |
+| `--cssp-danger`       | `#f38ba8` | Errors, destructive actions                  |
+| `--cssp-warning`      | `#f9e2af` | Warnings, caution states                     |
+| `--cssp-info`         | `#89dceb` | Informational messages                       |
 
 ### Tier 3 — Component (CSS Overrides)
 
@@ -114,55 +114,55 @@ This enables classes like `bg-bg`, `text-accent`, `border-muted`, `text-danger`,
 
 ### Font Size
 
-| Token | Value | Pixels |
-|---|---|---|
-| `--text-caption` | 0.75rem | 12px |
-| `--text-small` | 0.875rem | 14px |
-| `--text-body` | 1rem | 16px |
-| `--text-subheading` | 1.125rem | 18px |
-| `--text-heading` | 1.875rem | 30px |
-| `--text-display` | 3.75rem | 60px |
+| Token               | Value    | Pixels |
+| ------------------- | -------- | ------ |
+| `--text-caption`    | 0.75rem  | 12px   |
+| `--text-small`      | 0.875rem | 14px   |
+| `--text-body`       | 1rem     | 16px   |
+| `--text-subheading` | 1.125rem | 18px   |
+| `--text-heading`    | 1.875rem | 30px   |
+| `--text-display`    | 3.75rem  | 60px   |
 
 ### Font Family
 
-| Token | Value |
-|---|---|
-| `--font-sans` | `system-ui, sans-serif` |
+| Token         | Value                     |
+| ------------- | ------------------------- |
+| `--font-sans` | `system-ui, sans-serif`   |
 | `--font-mono` | `ui-monospace, monospace` |
 
 ### Font Weight
 
-| Token | Value |
-|---|---|
-| `--font-weight-normal` | 400 |
-| `--font-weight-medium` | 500 |
-| `--font-weight-semibold` | 600 |
-| `--font-weight-bold` | 700 |
+| Token                    | Value |
+| ------------------------ | ----- |
+| `--font-weight-normal`   | 400   |
+| `--font-weight-medium`   | 500   |
+| `--font-weight-semibold` | 600   |
+| `--font-weight-bold`     | 700   |
 
 ### Line Height
 
-| Token | Value |
-|---|---|
-| `--leading-tight` | 1.25 |
-| `--leading-snug` | 1.375 |
-| `--leading-normal` | 1.5 |
+| Token               | Value |
+| ------------------- | ----- |
+| `--leading-tight`   | 1.25  |
+| `--leading-snug`    | 1.375 |
+| `--leading-normal`  | 1.5   |
 | `--leading-relaxed` | 1.625 |
 
 ## Other Tokens
 
 ### Border Radius
 
-| Token | Value |
-|---|---|
+| Token              | Value         |
+| ------------------ | ------------- |
 | `--radius-DEFAULT` | 0.25rem (4px) |
-| `--radius-lg` | 0.5rem (8px) |
-| `--radius-full` | 9999px |
+| `--radius-lg`      | 0.5rem (8px)  |
+| `--radius-full`    | 9999px        |
 
 ### Breakpoints
 
-| Token | Value |
-|---|---|
-| `--breakpoint-sm` | 640px |
+| Token             | Value  |
+| ----------------- | ------ |
+| `--breakpoint-sm` | 640px  |
 | `--breakpoint-lg` | 1024px |
 | `--breakpoint-xl` | 1280px |
 
@@ -170,32 +170,68 @@ This enables classes like `bg-bg`, `text-accent`, `border-muted`, `text-danger`,
 
 Inside HtmlPreview iframes, patterns use a simplified set of token aliases called `BASE_TOKENS`. These are injected into every iframe automatically:
 
-| Alias | Value | Maps To |
-|---|---|---|
-| `--space-xs` | 8px | Spacing extra-small |
-| `--space-sm` | 12px | Spacing small |
-| `--space-md` | 20px | Spacing medium |
-| `--space-lg` | 32px | Spacing large |
-| `--radius` | 8px | Border radius |
-| `--accent` | `hsl(220 70% 50%)` | Primary action color |
-| `--accent-hover` | `hsl(220 70% 42%)` | Accent hover |
-| `--fg` | `hsl(220 25% 15%)` | Foreground text |
-| `--fg-muted` | `hsl(220 10% 40%)` | Muted text |
-| `--bg` | `hsl(0 0% 100%)` | Background |
-| `--bg-subtle` | `hsl(220 15% 96%)` | Subtle background |
-| `--border` | `hsl(220 15% 85%)` | Borders |
-| `--success` | `hsl(142 71% 45%)` | Success |
-| `--danger` | `hsl(0 84% 60%)` | Danger |
-| `--warning` | `hsl(45 93% 47%)` | Warning |
-| `--info` | `hsl(220 70% 50%)` | Info |
-| `--font-sm` | 0.85rem | Small font |
-| `--font-md` | 1rem | Medium font |
-| `--font-lg` | 1.1rem | Large font |
-| `--shadow` | `0 1px 3px hsl(220 25% 15% / 0.1)` | Subtle shadow |
-| `--shadow-strong` | `0 4px 12px hsl(220 25% 15% / 0.15)` | Strong shadow |
-| `--focus-ring` | `0 0 0 2px hsl(220 70% 50% / 0.25)` | Focus ring |
+| Alias             | Value                                | Maps To              |
+| ----------------- | ------------------------------------ | -------------------- |
+| `--space-xs`      | 8px                                  | Spacing extra-small  |
+| `--space-sm`      | 12px                                 | Spacing small        |
+| `--space-md`      | 20px                                 | Spacing medium       |
+| `--space-lg`      | 32px                                 | Spacing large        |
+| `--radius`        | 8px                                  | Border radius        |
+| `--accent`        | `hsl(220 70% 50%)`                   | Primary action color |
+| `--accent-hover`  | `hsl(220 70% 42%)`                   | Accent hover         |
+| `--fg`            | `hsl(220 25% 15%)`                   | Foreground text      |
+| `--fg-muted`      | `hsl(220 10% 40%)`                   | Muted text           |
+| `--bg`            | `hsl(0 0% 100%)`                     | Background           |
+| `--bg-subtle`     | `hsl(220 15% 96%)`                   | Subtle background    |
+| `--border`        | `hsl(220 15% 85%)`                   | Borders              |
+| `--success`       | `hsl(142 71% 45%)`                   | Success              |
+| `--danger`        | `hsl(0 84% 60%)`                     | Danger               |
+| `--warning`       | `hsl(45 93% 47%)`                    | Warning              |
+| `--info`          | `hsl(220 70% 50%)`                   | Info                 |
+| `--font-sm`       | 0.85rem                              | Small font           |
+| `--font-md`       | 1rem                                 | Medium font          |
+| `--font-lg`       | 1.1rem                               | Large font           |
+| `--shadow`        | `0 1px 3px hsl(220 25% 15% / 0.1)`   | Subtle shadow        |
+| `--shadow-strong` | `0 4px 12px hsl(220 25% 15% / 0.15)` | Strong shadow        |
+| `--focus-ring`    | `0 0 0 2px hsl(220 70% 50% / 0.25)`  | Focus ring           |
 
 These aliases use a light theme (white background, dark text) to contrast with the dark application chrome.
+
+## Demo Token Configuration
+
+The demo token configuration is defined in `src/lib/demo-tokens.ts` and provides a structured, centralized way to manage all tokens used inside HtmlPreview iframes.
+
+### Token Organization
+
+The `demoTokenConfig` object organizes tokens into four categories:
+
+| Category           | Tokens                                                                                | Type              |
+| ------------------ | ------------------------------------------------------------------------------------- | ----------------- |
+| **spacing**        | `--space-xs`, `--space-sm`, `--space-md`, `--space-lg`                                | `length`          |
+| **colors.palette** | `--accent`, `--accent-hover`, `--fg`, `--fg-muted`, `--bg`, `--bg-subtle`, `--border` | `color`           |
+| **colors.status**  | `--success`, `--danger`, `--warning`, `--info`                                        | `color`           |
+| **typography**     | `--font-sm`, `--font-md`, `--font-lg`                                                 | `length`          |
+| **decoration**     | `--radius`, `--shadow`, `--shadow-strong`, `--focus-ring`                             | `shadow`/`length` |
+
+Each token entry includes:
+
+- `variable` — the CSS custom property name
+- `defaultValue` — the default CSS value
+- `label` — human-readable label for UI display
+- `type` — value type (`color`, `length`, `shadow`, `composite`)
+
+### Token CSS Generation
+
+The `generateBaseTokensCss()` function produces a complete `:root` block from the config. It accepts an optional `overrides` map to replace default values:
+
+```typescript
+generateBaseTokensCss(); // All defaults
+generateBaseTokensCss({ "--accent": "hsl(0 80% 50%)" }); // Override accent
+```
+
+### Live Token Tweaking
+
+The **DemoTweakPanel** component provides a UI for editing demo tokens at runtime. Changes are applied to all registered HtmlPreview iframes via the iframe registry (`src/lib/iframe-registry.ts`), which sets CSS custom properties directly on each iframe's `documentElement`.
 
 ## Rules for AI and Humans
 
