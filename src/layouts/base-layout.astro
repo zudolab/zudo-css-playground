@@ -42,8 +42,8 @@ const { title, activeCategory } = Astro.props;
         <slot />
       </main>
     </div>
-    <ColorTweakPanel client:load />
-    <DemoTweakPanel client:load />
-    <AiChatModal client:load />
+    <ColorTweakPanel client:idle />
+    <DemoTweakPanel client:idle />
+    <AiChatModal client:idle />
   </body>
 </html>

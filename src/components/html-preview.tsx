@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { generateBaseTokensCss } from "../lib/demo-tokens";
 import { registerIframe, unregisterIframe } from "../lib/iframe-registry";
 
@@ -34,6 +34,8 @@ export default function HtmlPreview({
   // Track current display height via ref so handleDragStart needs no state deps
   const displayHeightRef = useRef(height ?? 200);
 
+  const baseTokensCss = useMemo(() => generateBaseTokensCss(), []);
+
   const srcdoc = `<!doctype html>
 <html>
 <head>
@@ -44,7 +46,7 @@ export default function HtmlPreview({
 body { font-family: system-ui, sans-serif; }
 input, button, textarea, select { font-family: inherit; }
 :focus-visible { outline: 2px solid var(--accent, hsl(220 70% 50%)); outline-offset: 2px; }
-${generateBaseTokensCss()}
+${baseTokensCss}
 ${css}
 </style>
 </head>

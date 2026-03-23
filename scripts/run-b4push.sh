@@ -4,10 +4,13 @@ set -euo pipefail
 echo "=== Step 1: TypeScript check ==="
 pnpm check
 
-echo "=== Step 2: Build playground app ==="
+echo "=== Step 2: Unit tests ==="
+pnpm test
+
+echo "=== Step 3: Build playground app ==="
 pnpm build
 
-echo "=== Step 3: Doc build (if doc/ exists) ==="
+echo "=== Step 4: Doc build (if doc/ exists) ==="
 if [ -d "doc" ] && [ -f "doc/package.json" ]; then
   pnpm doc:build
 fi

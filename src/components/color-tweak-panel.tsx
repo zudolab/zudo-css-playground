@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import HslPicker from "./hsl-picker";
 import PaletteSelector from "./palette-selector";
+import { useDraggable } from "../hooks/use-draggable";
 
 interface TweakState {
   palette: string[];
@@ -181,14 +182,6 @@ function loadState(): { state: TweakState; preset: string } {
   };
 }
 
-function centerPosition(): { x: number; y: number } {
-  if (typeof window === "undefined") return { x: 0, y: 0 };
-  return {
-    x: Math.max(0, (window.innerWidth - PANEL_WIDTH) / 2),
-    y: Math.max(0, (window.innerHeight - 500) / 2),
-  };
-}
-
 function applyToDocument(state: TweakState) {
   const el = document.documentElement;
   state.palette.forEach((color, i) => {
@@ -268,17 +261,15 @@ export default function ColorTweakPanel() {
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<TweakState>(initial.state);
   const [preset, setPreset] = useState(initial.preset);
-  const [position, setPosition] = useState(centerPosition);
   const panelRef = useRef<HTMLDivElement>(null);
-  const dragging = useRef(false);
-  const dragOffset = useRef({ x: 0, y: 0 });
+  const { position, onMouseDown, recenter } = useDraggable(PANEL_WIDTH);
 
   // Re-center panel each time it opens
   useEffect(() => {
     if (open) {
-      setPosition(centerPosition());
+      recenter();
     }
-  }, [open]);
+  }, [open, recenter]);
 
   // Apply colors on mount and state change
   useEffect(() => {
@@ -289,46 +280,6 @@ export default function ColorTweakPanel() {
       // ignore
     }
   }, [state]);
-
-  // Drag handlers
-  const onMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      dragging.current = true;
-      dragOffset.current = {
-        x: e.clientX - position.x,
-        y: e.clientY - position.y,
-      };
-      e.preventDefault();
-
-      const onMouseMove = (ev: MouseEvent) => {
-        if (!dragging.current) return;
-        setPosition({
-          x: Math.max(
-            0,
-            Math.min(
-              ev.clientX - dragOffset.current.x,
-              window.innerWidth - PANEL_WIDTH,
-            ),
-          ),
-          y: Math.max(
-            0,
-            Math.min(
-              ev.clientY - dragOffset.current.y,
-              window.innerHeight - 100,
-            ),
-          ),
-        });
-      };
-      const onMouseUp = () => {
-        dragging.current = false;
-        window.removeEventListener("mousemove", onMouseMove);
-        window.removeEventListener("mouseup", onMouseUp);
-      };
-      window.addEventListener("mousemove", onMouseMove);
-      window.addEventListener("mouseup", onMouseUp);
-    },
-    [position],
-  );
 
   const updatePalette = (index: number, color: string) => {
     setState((prev) => {

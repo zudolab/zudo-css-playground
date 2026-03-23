@@ -7,10 +7,9 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseAiResponse } from "../../lib/parse-ai-response";
 import { SYSTEM_PROMPT } from "../../lib/ai-system-prompt";
+import { jsonResponse } from "../../lib/api-utils";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
-// In dev: src/pages/api/ → ../../ = src/
-// Resolve to project root's src/pages/ for writing pattern files
 const PROJECT_ROOT = join(__dirname, "..", "..", "..");
 const PAGES_DIR = join(PROJECT_ROOT, "src", "pages");
 
@@ -23,11 +22,6 @@ interface ChatMessage {
 
 const MAX_HISTORY_LENGTH = 20;
 const MAX_MESSAGE_LENGTH = 4000;
-const JSON_HEADERS = { "Content-Type": "application/json" };
-
-function jsonResponse(data: Record<string, unknown>, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: JSON_HEADERS });
-}
 
 // Read existing page content to give AI context about what exists
 function readExistingPages(): string {

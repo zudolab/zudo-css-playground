@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   setGlobalOverrides,
   resetGlobalOverrides,
@@ -10,6 +10,7 @@ import {
 } from "../lib/token-panel-config";
 import { hexToHsl, hslToHex, hslToCssString } from "../lib/color-convert";
 import HslPicker from "./hsl-picker";
+import { useDraggable } from "../hooks/use-draggable";
 
 type Tab = "color" | "typography" | "spacing";
 
@@ -96,30 +97,22 @@ function stateToOverrides(state: DemoTweakState): Record<string, string> {
   return overrides;
 }
 
-function centerPosition(): { x: number; y: number } {
-  if (typeof window === "undefined") return { x: 0, y: 0 };
-  return {
-    x: Math.max(0, (window.innerWidth - 280) / 2),
-    y: Math.max(0, (window.innerHeight - 500) / 2),
-  };
-}
+const DEMO_PANEL_WIDTH = 280;
 
 export default function DemoTweakPanel() {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("color");
   const [state, setState] = useState<DemoTweakState>(loadState);
-  const [position, setPosition] = useState(centerPosition);
   const [pickerTarget, setPickerTarget] = useState<string | null>(null);
   const swatchRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const dragging = useRef(false);
-  const dragOffset = useRef({ x: 0, y: 0 });
+  const { position, onMouseDown, recenter } = useDraggable(DEMO_PANEL_WIDTH);
 
   // Re-center when opened
   useEffect(() => {
     if (open) {
-      setPosition(centerPosition());
+      recenter();
     }
-  }, [open]);
+  }, [open, recenter]);
 
   // Apply overrides on mount and state change
   useEffect(() => {
@@ -131,46 +124,6 @@ export default function DemoTweakPanel() {
       // ignore
     }
   }, [state]);
-
-  // Drag handlers
-  const onMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      dragging.current = true;
-      dragOffset.current = {
-        x: e.clientX - position.x,
-        y: e.clientY - position.y,
-      };
-      e.preventDefault();
-
-      const onMouseMove = (ev: MouseEvent) => {
-        if (!dragging.current) return;
-        setPosition({
-          x: Math.max(
-            0,
-            Math.min(
-              ev.clientX - dragOffset.current.x,
-              window.innerWidth - 280,
-            ),
-          ),
-          y: Math.max(
-            0,
-            Math.min(
-              ev.clientY - dragOffset.current.y,
-              window.innerHeight - 100,
-            ),
-          ),
-        });
-      };
-      const onMouseUp = () => {
-        dragging.current = false;
-        window.removeEventListener("mousemove", onMouseMove);
-        window.removeEventListener("mouseup", onMouseUp);
-      };
-      window.addEventListener("mousemove", onMouseMove);
-      window.addEventListener("mouseup", onMouseUp);
-    },
-    [position],
-  );
 
   const updateColor = (variable: string, hex: string) => {
     setState((prev) => ({
@@ -402,7 +355,7 @@ export default function DemoTweakPanel() {
           left: position.x,
           top: position.y,
           zIndex: 9999,
-          width: 280,
+          width: DEMO_PANEL_WIDTH,
           maxHeight: "calc(100vh - 32px)",
           overflowY: "auto",
           background: "#313244",

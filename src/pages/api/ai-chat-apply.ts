@@ -6,16 +6,11 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isValidAstroFilename } from "../../lib/validate-astro-filename";
 import { updateSidebarNavContent } from "../../lib/update-sidebar-nav";
+import { jsonResponse } from "../../lib/api-utils";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const PROJECT_ROOT = join(__dirname, "..", "..", "..");
 const PAGES_DIR = join(PROJECT_ROOT, "src", "pages");
-
-const JSON_HEADERS = { "Content-Type": "application/json" };
-
-function jsonResponse(data: Record<string, unknown>, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: JSON_HEADERS });
-}
 
 /**
  * Writes pending files and updates sidebar.
