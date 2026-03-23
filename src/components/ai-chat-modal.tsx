@@ -141,6 +141,18 @@ export default function AiChatModal() {
             }),
             signal: abort.signal,
           });
+          if (!applyRes.ok) {
+            const errText = await applyRes.text().catch(() => "");
+            let errMsg = `Failed to write files (${applyRes.status})`;
+            try {
+              const errData = JSON.parse(errText);
+              if (errData.error) errMsg = errData.error;
+            } catch {
+              // non-JSON
+            }
+            setError(errMsg);
+            return;
+          }
           const applyData = await applyRes.json();
 
           const filesWritten: string[] =

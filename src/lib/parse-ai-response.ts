@@ -12,10 +12,10 @@ function isStringRecord(val: unknown): val is Record<string, string> {
   return Object.values(val).every((v) => typeof v === "string");
 }
 
-function isValidSidebarEntry(
+export function isValidSidebarEntry(
   val: unknown,
 ): val is { slug: string; label: string; count: number } {
-  if (typeof val !== "object" || val === null) return false;
+  if (typeof val !== "object" || val === null || Array.isArray(val)) return false;
   const obj = val as Record<string, unknown>;
   return (
     typeof obj.slug === "string" &&

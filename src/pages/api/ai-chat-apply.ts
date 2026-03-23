@@ -5,6 +5,7 @@ import { writeFileSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isValidAstroFilename } from "../../lib/validate-astro-filename";
+import { isValidSidebarEntry } from "../../lib/parse-ai-response";
 import { updateSidebarNavContent } from "../../lib/update-sidebar-nav";
 import { jsonResponse } from "../../lib/api-utils";
 
@@ -45,16 +46,12 @@ export const POST: APIRoute = async ({ request }) => {
     writtenFiles.push(filename);
   }
 
-  const se = sidebarEntry as Record<string, unknown> | undefined;
-  if (
-    se &&
-    typeof se === "object" &&
-    typeof se.slug === "string" &&
-    typeof se.label === "string" &&
-    typeof se.count === "number" &&
-    writtenFiles.length > 0
-  ) {
-    const entry = { slug: se.slug, label: se.label, count: se.count };
+  if (isValidSidebarEntry(sidebarEntry) && writtenFiles.length > 0) {
+    const entry = {
+      slug: sidebarEntry.slug,
+      label: sidebarEntry.label,
+      count: sidebarEntry.count,
+    };
     const navPath = join(PROJECT_ROOT, "src", "components", "sidebar-nav.tsx");
     if (existsSync(navPath)) {
       const content = readFileSync(navPath, "utf-8");

@@ -10,12 +10,12 @@ export function updateSidebarNavContent(
   const safeLabel = entry.label.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
   const entryStr = `{ slug: "${safeSlug}", label: "${safeLabel}", count: ${entry.count} }`;
 
-  // Check if category already exists — update count
-  if (content.includes(`slug: "${entry.slug}"`)) {
-    const escapedSlug = entry.slug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const escapedLabel = entry.label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  // Check if category already exists — update count (use escaped values to match content)
+  if (content.includes(`slug: "${safeSlug}"`)) {
+    const regexSlug = safeSlug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regexLabel = safeLabel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const pattern = new RegExp(
-      `\\{ slug: "${escapedSlug}", label: "${escapedLabel}", count: \\d+ \\}`,
+      `\\{ slug: "${regexSlug}", label: "${regexLabel}", count: \\d+ \\}`,
     );
     return content.replace(pattern, entryStr);
   }

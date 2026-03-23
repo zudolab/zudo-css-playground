@@ -1,5 +1,10 @@
 import { useState, useRef, useCallback } from "react";
 
+/** Estimated panel height for centering calculation */
+const DEFAULT_ESTIMATED_HEIGHT = 500;
+/** Minimum visible portion at bottom edge during drag */
+const MIN_VISIBLE_BOTTOM = 100;
+
 /**
  * Shared drag-to-move hook for floating panels.
  * Uses refs instead of state dependencies to avoid
@@ -10,7 +15,7 @@ export function useDraggable(panelWidth: number) {
     if (typeof window === "undefined") return { x: 0, y: 0 };
     return {
       x: Math.max(0, (window.innerWidth - panelWidth) / 2),
-      y: Math.max(0, (window.innerHeight - 500) / 2),
+      y: Math.max(0, (window.innerHeight - DEFAULT_ESTIMATED_HEIGHT) / 2),
     };
   });
 
@@ -42,7 +47,7 @@ export function useDraggable(panelWidth: number) {
             0,
             Math.min(
               ev.clientY - dragOffset.current.y,
-              window.innerHeight - 100,
+              window.innerHeight - MIN_VISIBLE_BOTTOM,
             ),
           ),
         });
@@ -62,7 +67,7 @@ export function useDraggable(panelWidth: number) {
     if (typeof window === "undefined") return;
     setPosition({
       x: Math.max(0, (window.innerWidth - panelWidth) / 2),
-      y: Math.max(0, (window.innerHeight - 500) / 2),
+      y: Math.max(0, (window.innerHeight - DEFAULT_ESTIMATED_HEIGHT) / 2),
     });
   }, [panelWidth]);
 

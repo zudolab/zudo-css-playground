@@ -36,7 +36,7 @@ export default function HtmlPreview({
 
   const baseTokensCss = useMemo(() => generateBaseTokensCss(), []);
 
-  const srcdoc = `<!doctype html>
+  const srcdoc = useMemo(() => `<!doctype html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -73,7 +73,7 @@ window.addEventListener("message", function(e) {
   }
 });
 </script>
-</html>`;
+</html>`, [html, css, baseTokensCss]);
 
   const measureHeight = useCallback(() => {
     const iframe = iframeRef.current;
