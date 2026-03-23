@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseAiResponse } from "../parse-ai-response";
+import { parseAiResponse, isValidSidebarEntry } from "../parse-ai-response";
 
 describe("parseAiResponse", () => {
   it("returns pending_files for create_patterns action", () => {
@@ -91,5 +91,87 @@ describe("parseAiResponse", () => {
     const result = parseAiResponse(raw);
     // No valid files means we fall back to chat
     expect(result.action).toBe("chat");
+  });
+
+  it("rejects non-string file values", () => {
+    const raw = JSON.stringify({
+      action: "create_patterns",
+      files: { "buttons.astro": 42, "cards.astro": null },
+      message: "Done",
+    });
+    const result = parseAiResponse(raw);
+    expect(result.action).toBe("chat");
+  });
+
+  it("handles malformed sidebarEntry gracefully", () => {
+    const raw = JSON.stringify({
+      action: "create_patterns",
+      files: { "nav.astro": "<nav/>" },
+      sidebarEntry: { slug: "nav" }, // missing label and count
+      message: "Done",
+    });
+    const result = parseAiResponse(raw);
+    expect(result.action).toBe("pending_files");
+    expect(result.sidebarEntry).toBeUndefined();
+  });
+
+  it("handles array sidebarEntry gracefully", () => {
+    const raw = JSON.stringify({
+      action: "create_patterns",
+      files: { "nav.astro": "<nav/>" },
+      sidebarEntry: ["slug", "label"],
+      message: "Done",
+    });
+    const result = parseAiResponse(raw);
+    expect(result.sidebarEntry).toBeUndefined();
+  });
+
+  it("handles non-string message field", () => {
+    const raw = JSON.stringify({
+      action: "chat",
+      message: 123,
+    });
+    const result = parseAiResponse(raw);
+    expect(result.action).toBe("chat");
+    expect(result.message).toBe(raw);
+  });
+
+  it("generates default message when message is missing", () => {
+    const raw = JSON.stringify({
+      action: "create_patterns",
+      files: { "footer.astro": "<footer/>" },
+    });
+    const result = parseAiResponse(raw);
+    expect(result.message).toBe("Created footer.astro.");
+  });
+});
+
+describe("isValidSidebarEntry", () => {
+  it("accepts valid entries", () => {
+    expect(isValidSidebarEntry({ slug: "a", label: "A", count: 1 })).toBe(
+      true,
+    );
+  });
+
+  it("rejects null", () => {
+    expect(isValidSidebarEntry(null)).toBe(false);
+  });
+
+  it("rejects arrays", () => {
+    expect(isValidSidebarEntry(["a", "b"])).toBe(false);
+  });
+
+  it("rejects entries with missing fields", () => {
+    expect(isValidSidebarEntry({ slug: "a" })).toBe(false);
+    expect(isValidSidebarEntry({ slug: "a", label: "A" })).toBe(false);
+  });
+
+  it("rejects entries with wrong types", () => {
+    expect(isValidSidebarEntry({ slug: 1, label: "A", count: 1 })).toBe(
+      false,
+    );
+    expect(isValidSidebarEntry({ slug: "a", label: "A", count: "1" })).toBe(
+      false,
+    );
   });
 });

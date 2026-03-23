@@ -26,6 +26,11 @@ describe("isValidAstroFilename", () => {
     expect(isValidAstroFilename("a/b/c.astro")).toBe(false);
   });
 
+  it("rejects backslash directory separators (\\)", () => {
+    expect(isValidAstroFilename("sub\\page.astro")).toBe(false);
+    expect(isValidAstroFilename("a\\b\\c.astro")).toBe(false);
+  });
+
   it("rejects empty or whitespace-only names", () => {
     expect(isValidAstroFilename("")).toBe(false);
     expect(isValidAstroFilename("  ")).toBe(false);

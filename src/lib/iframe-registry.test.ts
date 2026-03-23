@@ -7,11 +7,13 @@ import {
   resetGlobalOverrides,
 } from "./iframe-registry";
 
-// Mock iframe with a fake contentDocument
+// Mock iframe with a fake contentDocument and contentWindow
 function createMockIframe(): HTMLIFrameElement & {
   __styles: Record<string, string>;
+  __messages: unknown[];
 } {
   const styles: Record<string, string> = {};
+  const messages: unknown[] = [];
   return {
     contentDocument: {
       documentElement: {
@@ -25,8 +27,17 @@ function createMockIframe(): HTMLIFrameElement & {
         },
       },
     },
+    contentWindow: {
+      postMessage(data: unknown) {
+        messages.push(data);
+      },
+    },
     __styles: styles,
-  } as unknown as HTMLIFrameElement & { __styles: Record<string, string> };
+    __messages: messages,
+  } as unknown as HTMLIFrameElement & {
+    __styles: Record<string, string>;
+    __messages: unknown[];
+  };
 }
 
 // Track mock iframes added to the "DOM"
@@ -116,6 +127,54 @@ describe("iframe-registry", () => {
       const iframe = createMockIframe();
       registerIframe(iframe);
       expect(Object.keys(iframe.__styles)).toHaveLength(0);
+    });
+  });
+
+  describe("postMessage sync", () => {
+    it("sends postMessage when applying overrides via setGlobalOverrides", () => {
+      const iframe = createMockIframe();
+      domIframes = [iframe];
+      setGlobalOverrides({ "--accent": "blue" });
+      expect(iframe.__messages).toHaveLength(1);
+      expect(iframe.__messages[0]).toEqual({
+        type: "cssp-token-override",
+        overrides: { "--accent": "blue" },
+      });
+    });
+
+    it("sends postMessage when applying overrides via applyToAllIframes", () => {
+      const iframe = createMockIframe();
+      domIframes = [iframe];
+      applyToAllIframes("--fg", "black");
+      expect(iframe.__messages).toHaveLength(1);
+      expect(iframe.__messages[0]).toEqual({
+        type: "cssp-token-override",
+        overrides: { "--fg": "black" },
+      });
+    });
+
+    it("sends postMessage when registering iframe with existing overrides", () => {
+      setGlobalOverrides({ "--accent": "green" });
+      const iframe = createMockIframe();
+      registerIframe(iframe);
+      expect(iframe.__messages).toHaveLength(1);
+      expect(iframe.__messages[0]).toEqual({
+        type: "cssp-token-override",
+        overrides: { "--accent": "green" },
+      });
+    });
+
+    it("sends reset message via postMessage on reset", () => {
+      const iframe = createMockIframe();
+      domIframes = [iframe];
+      setGlobalOverrides({ "--accent": "red" });
+      iframe.__messages.length = 0; // clear prior messages
+      resetGlobalOverrides();
+      expect(iframe.__messages).toHaveLength(1);
+      expect(iframe.__messages[0]).toEqual({
+        type: "cssp-token-reset",
+        keys: ["--accent"],
+      });
     });
   });
 });

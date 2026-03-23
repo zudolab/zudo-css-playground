@@ -1,18 +1,22 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   setGlobalOverrides,
   resetGlobalOverrides,
 } from "../lib/iframe-registry";
-import { demoTokenConfig } from "../lib/demo-tokens";
+import {
+  demoPanelGroups,
+  getColorGroups,
+  getSliderGroups,
+} from "../lib/token-panel-config";
 import { hexToHsl, hslToHex, hslToCssString } from "../lib/color-convert";
 import HslPicker from "./hsl-picker";
+import { useDraggable } from "../hooks/use-draggable";
 
 type Tab = "color" | "typography" | "spacing";
 
 interface DemoTweakState {
   colors: Record<string, string>;
-  typography: Record<string, string>;
-  spacing: Record<string, string>;
+  sliders: Record<string, string>;
 }
 
 const STORAGE_KEY = "demo-tweak-state";
@@ -31,27 +35,44 @@ function hslStringToHex(hslStr: string): string {
 
 function buildDefaults(): DemoTweakState {
   const colors: Record<string, string> = {};
-  for (const token of [
-    ...demoTokenConfig.colors.palette,
-    ...demoTokenConfig.colors.status,
-  ]) {
-    colors[token.variable] = hslStringToHex(token.defaultValue);
+  const sliders: Record<string, string> = {};
+  for (const group of demoPanelGroups) {
+    if (group.type === "color") {
+      for (const token of group.tokens) {
+        colors[token.variable] = hslStringToHex(token.defaultValue);
+      }
+    } else {
+      for (const token of group.tokens) {
+        sliders[token.variable] = parseFloat(token.defaultValue).toString();
+      }
+    }
   }
-  const typography: Record<string, string> = {};
-  for (const token of demoTokenConfig.typography) {
-    typography[token.variable] = parseFloat(token.defaultValue).toString();
+  return { colors, sliders };
+}
+
+/** Migrate old state shape (typography+spacing) to new (sliders) */
+function migrateState(saved: Record<string, unknown>): DemoTweakState {
+  if ("sliders" in saved && typeof saved.sliders === "object") {
+    return saved as unknown as DemoTweakState;
   }
-  const spacing: Record<string, string> = {};
-  for (const token of demoTokenConfig.spacing) {
-    spacing[token.variable] = parseFloat(token.defaultValue).toString();
+  const defaults = buildDefaults();
+  const colors =
+    typeof saved.colors === "object" && saved.colors
+      ? (saved.colors as Record<string, string>)
+      : defaults.colors;
+  const sliders = { ...defaults.sliders };
+  for (const key of ["typography", "spacing"] as const) {
+    if (typeof saved[key] === "object" && saved[key]) {
+      Object.assign(sliders, saved[key]);
+    }
   }
-  return { colors, typography, spacing };
+  return { colors, sliders };
 }
 
 function loadState(): DemoTweakState {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return JSON.parse(saved);
+    if (saved) return migrateState(JSON.parse(saved));
   } catch {
     // ignore
   }
@@ -64,39 +85,34 @@ function stateToOverrides(state: DemoTweakState): Record<string, string> {
     const { h, s, l } = hexToHsl(hex);
     overrides[variable] = hslToCssString(h, s, l);
   }
-  for (const [variable, value] of Object.entries(state.typography)) {
-    overrides[variable] = value + "rem";
-  }
-  for (const [variable, value] of Object.entries(state.spacing)) {
-    overrides[variable] = value + "px";
+  for (const group of getSliderGroups()) {
+    const unit = group.sliderConfig?.unit ?? "";
+    for (const token of group.tokens) {
+      const value = state.sliders[token.variable];
+      if (value !== undefined) {
+        overrides[token.variable] = value + unit;
+      }
+    }
   }
   return overrides;
 }
 
-function centerPosition(): { x: number; y: number } {
-  if (typeof window === "undefined") return { x: 0, y: 0 };
-  return {
-    x: Math.max(0, (window.innerWidth - 280) / 2),
-    y: Math.max(0, (window.innerHeight - 500) / 2),
-  };
-}
+const DEMO_PANEL_WIDTH = 280;
 
 export default function DemoTweakPanel() {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("color");
   const [state, setState] = useState<DemoTweakState>(loadState);
-  const [position, setPosition] = useState(centerPosition);
   const [pickerTarget, setPickerTarget] = useState<string | null>(null);
   const swatchRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const dragging = useRef(false);
-  const dragOffset = useRef({ x: 0, y: 0 });
+  const { position, onMouseDown, recenter } = useDraggable(DEMO_PANEL_WIDTH);
 
   // Re-center when opened
   useEffect(() => {
     if (open) {
-      setPosition(centerPosition());
+      recenter();
     }
-  }, [open]);
+  }, [open, recenter]);
 
   // Apply overrides on mount and state change
   useEffect(() => {
@@ -109,46 +125,6 @@ export default function DemoTweakPanel() {
     }
   }, [state]);
 
-  // Drag handlers
-  const onMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      dragging.current = true;
-      dragOffset.current = {
-        x: e.clientX - position.x,
-        y: e.clientY - position.y,
-      };
-      e.preventDefault();
-
-      const onMouseMove = (ev: MouseEvent) => {
-        if (!dragging.current) return;
-        setPosition({
-          x: Math.max(
-            0,
-            Math.min(
-              ev.clientX - dragOffset.current.x,
-              window.innerWidth - 280,
-            ),
-          ),
-          y: Math.max(
-            0,
-            Math.min(
-              ev.clientY - dragOffset.current.y,
-              window.innerHeight - 100,
-            ),
-          ),
-        });
-      };
-      const onMouseUp = () => {
-        dragging.current = false;
-        window.removeEventListener("mousemove", onMouseMove);
-        window.removeEventListener("mouseup", onMouseUp);
-      };
-      window.addEventListener("mousemove", onMouseMove);
-      window.addEventListener("mouseup", onMouseUp);
-    },
-    [position],
-  );
-
   const updateColor = (variable: string, hex: string) => {
     setState((prev) => ({
       ...prev,
@@ -156,17 +132,10 @@ export default function DemoTweakPanel() {
     }));
   };
 
-  const updateTypography = (variable: string, value: string) => {
+  const updateSlider = (variable: string, value: string) => {
     setState((prev) => ({
       ...prev,
-      typography: { ...prev.typography, [variable]: value },
-    }));
-  };
-
-  const updateSpacing = (variable: string, value: string) => {
-    setState((prev) => ({
-      ...prev,
-      spacing: { ...prev.spacing, [variable]: value },
+      sliders: { ...prev.sliders, [variable]: value },
     }));
   };
 
@@ -198,7 +167,7 @@ export default function DemoTweakPanel() {
 
   const renderColorSection = (
     title: string,
-    tokens: typeof demoTokenConfig.colors.palette,
+    tokens: { variable: string; label: string }[],
   ) => (
     <div>
       <div style={sectionHeaderStyle}>{title}</div>
@@ -246,18 +215,31 @@ export default function DemoTweakPanel() {
     </div>
   );
 
-  const renderSliderSection = (
+  const renderSliderGroup = (group: (typeof demoPanelGroups)[number]) => {
+    const {
+      unit = "",
+      min = 0,
+      max = 100,
+      step = 1,
+    } = group.sliderConfig ?? {};
+    return (
+      <div key={group.id}>
+        <div style={sectionHeaderStyle}>{group.label}</div>
+        {renderSliderTokens(group.tokens, unit, min, max, step)}
+      </div>
+    );
+  };
+
+  const renderSliderTokens = (
     tokens: { variable: string; label: string }[],
-    values: Record<string, string>,
     unit: string,
     min: number,
     max: number,
     step: number,
-    onUpdate: (variable: string, value: string) => void,
   ) => (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       {tokens.map((token) => {
-        const val = values[token.variable] || "0";
+        const val = state.sliders[token.variable] || "0";
         return (
           <div key={token.variable}>
             <div
@@ -276,7 +258,7 @@ export default function DemoTweakPanel() {
                 onChange={(e) => {
                   const num = parseFloat(e.target.value);
                   if (!isNaN(num)) {
-                    onUpdate(token.variable, num.toString());
+                    updateSlider(token.variable, num.toString());
                   }
                 }}
                 style={{
@@ -299,7 +281,10 @@ export default function DemoTweakPanel() {
               step={step}
               value={Number(val)}
               onInput={(e) =>
-                onUpdate(token.variable, (e.target as HTMLInputElement).value)
+                updateSlider(
+                  token.variable,
+                  (e.target as HTMLInputElement).value,
+                )
               }
               style={{
                 width: "100%",
@@ -370,7 +355,7 @@ export default function DemoTweakPanel() {
           left: position.x,
           top: position.y,
           zIndex: 9999,
-          width: 280,
+          width: DEMO_PANEL_WIDTH,
           maxHeight: "calc(100vh - 32px)",
           overflowY: "auto",
           background: "#313244",
@@ -385,6 +370,7 @@ export default function DemoTweakPanel() {
         {/* Title bar (draggable) */}
         <div
           onMouseDown={onMouseDown}
+          aria-label="Drag to move Demo Tweak panel"
           style={{
             padding: "8px 12px",
             cursor: "grab",
@@ -446,45 +432,24 @@ export default function DemoTweakPanel() {
         <div style={{ padding: "8px 12px" }}>
           {tab === "color" && (
             <>
-              {renderColorSection(
-                "Palette Colors",
-                demoTokenConfig.colors.palette,
-              )}
-              <div style={{ height: 8 }} />
-              {renderColorSection(
-                "Status Colors",
-                demoTokenConfig.colors.status,
-              )}
+              {getColorGroups().map((group, i) => (
+                <div key={group.id}>
+                  {i > 0 && <div style={{ height: 8 }} />}
+                  {renderColorSection(group.label, group.tokens)}
+                </div>
+              ))}
             </>
           )}
 
           {tab === "typography" &&
-            renderSliderSection(
-              demoTokenConfig.typography.map((t) => ({
-                variable: t.variable,
-                label: t.label,
-              })),
-              state.typography,
-              "rem",
-              0.5,
-              3,
-              0.05,
-              updateTypography,
-            )}
+            getSliderGroups()
+              .filter((g) => g.id === "typography")
+              .map(renderSliderGroup)}
 
           {tab === "spacing" &&
-            renderSliderSection(
-              demoTokenConfig.spacing.map((t) => ({
-                variable: t.variable,
-                label: t.label,
-              })),
-              state.spacing,
-              "px",
-              0,
-              64,
-              1,
-              updateSpacing,
-            )}
+            getSliderGroups()
+              .filter((g) => g.id === "spacing" || g.id === "decoration")
+              .map(renderSliderGroup)}
 
           {/* Reset button */}
           <div style={{ marginTop: 12 }}>

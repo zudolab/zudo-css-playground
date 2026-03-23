@@ -1,0 +1,10 @@
+{
+  "name": "@zudo-css-playground/design-system",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tokens.css": "./tokens.css",
+    "./token-data": "./token-data.ts"
+  }
+}

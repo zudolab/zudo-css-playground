@@ -40,6 +40,28 @@ function renderInline(text: string): string {
   );
 }
 
+function renderList(
+  trimmed: string,
+  itemPattern: RegExp,
+  stripPattern: RegExp,
+  tag: "ul" | "ol",
+): string {
+  const lines = trimmed.split("\n");
+  const preamble = lines
+    .filter((l) => !itemPattern.test(l.trim()))
+    .filter((l) => l.trim());
+  const items = lines
+    .filter((l) => itemPattern.test(l.trim()))
+    .map(
+      (l) => `<li>${renderInline(l.trim().replace(stripPattern, ""))}</li>`,
+    )
+    .join("");
+  const prefix = preamble.length
+    ? `<p>${preamble.map(renderInline).join("<br>")}</p>`
+    : "";
+  return `${prefix}<${tag}>${items}</${tag}>`;
+}
+
 export function renderMarkdown(src: string): string {
   // Escape HTML first — all subsequent replacements only add safe tags
   const escaped = escapeHtml(src);
@@ -69,26 +91,12 @@ export function renderMarkdown(src: string): string {
 
       // Unordered list (lines starting with - or *)
       if (/^[-*] /m.test(trimmed)) {
-        const items = trimmed
-          .split("\n")
-          .filter((l) => /^[-*] /.test(l.trim()))
-          .map(
-            (l) => `<li>${renderInline(l.trim().replace(/^[-*] /, ""))}</li>`,
-          )
-          .join("");
-        return `<ul>${items}</ul>`;
+        return renderList(trimmed, /^[-*] /, /^[-*] /, "ul");
       }
 
       // Ordered list (lines starting with 1. 2. etc.)
       if (/^\d+\. /m.test(trimmed)) {
-        const items = trimmed
-          .split("\n")
-          .filter((l) => /^\d+\. /.test(l.trim()))
-          .map(
-            (l) => `<li>${renderInline(l.trim().replace(/^\d+\. /, ""))}</li>`,
-          )
-          .join("");
-        return `<ol>${items}</ol>`;
+        return renderList(trimmed, /^\d+\. /, /^\d+\. /, "ol");
       }
 
       // Heading (# to ###)

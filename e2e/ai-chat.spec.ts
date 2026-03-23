@@ -89,16 +89,26 @@ test.describe("AI Chat Modal", () => {
     await expect(md.locator("code")).toHaveText("code");
   });
 
-  test("files_written response shows Reload button", async ({ page }) => {
+  test("pending_files response shows Reload button", async ({ page }) => {
     await page.route("**/api/ai-chat", (route) =>
       route.fulfill({
         status: 200,
         contentType: "application/json",
         body: JSON.stringify({
-          action: "files_written",
-          files: ["breadcrumbs.astro"],
+          action: "pending_files",
+          files: { "breadcrumbs.astro": "<html>breadcrumbs</html>" },
           message: "Created 10 breadcrumb patterns!",
           needsReload: true,
+        }),
+      }),
+    );
+    await page.route("**/api/ai-chat-apply", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          ok: true,
+          files: ["breadcrumbs.astro"],
         }),
       }),
     );
@@ -126,10 +136,20 @@ test.describe("AI Chat Modal", () => {
         status: 200,
         contentType: "application/json",
         body: JSON.stringify({
-          action: "files_written",
-          files: ["cards.astro"],
+          action: "pending_files",
+          files: { "cards.astro": "<html>cards</html>" },
           message: "Created card patterns!",
           needsReload: true,
+        }),
+      }),
+    );
+    await page.route("**/api/ai-chat-apply", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          ok: true,
+          files: ["cards.astro"],
         }),
       }),
     );
