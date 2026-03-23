@@ -8,5 +8,7 @@ export function getCssStyle(): CssStyle {
 }
 
 export function setCssStyle(style: CssStyle): void {
-  localStorage.setItem(CSS_STYLE_KEY, style);
+  if (typeof window !== "undefined") {
+    localStorage.setItem(CSS_STYLE_KEY, style);
+  }
 }

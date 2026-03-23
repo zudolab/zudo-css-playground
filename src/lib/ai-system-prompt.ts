@@ -83,6 +83,3 @@ export function getSystemPrompt(cssStyle: CssStyle = "tailwind"): string {
     cssStyle === "general" ? GENERAL_CSS_RULES : TAILWIND_CSS_RULES;
   return BASE_PROMPT + cssRules + CHAT_FALLBACK;
 }
-
-/** @deprecated Use getSystemPrompt() instead for CSS-style-aware prompts */
-export const SYSTEM_PROMPT = BASE_PROMPT + GENERAL_CSS_RULES + CHAT_FALLBACK;

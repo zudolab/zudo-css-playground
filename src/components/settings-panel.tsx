@@ -6,12 +6,8 @@ const PANEL_WIDTH = 280;
 
 export default function SettingsPanel() {
   const [open, setOpen] = useState(false);
-  const [cssStyle, setCssStyleState] = useState<CssStyle>("tailwind");
+  const [cssStyle, setCssStyleState] = useState<CssStyle>(() => getCssStyle());
   const { position, onMouseDown, recenter } = useDraggable(PANEL_WIDTH);
-
-  useEffect(() => {
-    setCssStyleState(getCssStyle());
-  }, []);
 
   useEffect(() => {
     if (open) {
@@ -64,101 +60,103 @@ export default function SettingsPanel() {
     </button>
   );
 
-  if (!open) return toggleButton;
-
   return (
     <>
       {toggleButton}
-      <div
-        style={{
-          position: "fixed",
-          left: position.x,
-          top: position.y,
-          zIndex: 9999,
-          width: PANEL_WIDTH,
-          background: "#1c1c1c",
-          border: "1px solid rgba(255,255,255,0.1)",
-          borderRadius: 8,
-          boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
-          fontFamily: "system-ui, sans-serif",
-          fontSize: 12,
-          color: "#e0e0e0",
-        }}
-      >
-        {/* Title bar (draggable) */}
+      {open && (
         <div
-          onMouseDown={onMouseDown}
-          aria-label="Drag to move Settings panel"
           style={{
-            padding: "8px 12px",
-            cursor: "grab",
-            borderBottom: "1px solid rgba(255,255,255,0.08)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            userSelect: "none",
+            position: "fixed",
+            left: position.x,
+            top: position.y,
+            zIndex: 9999,
+            width: PANEL_WIDTH,
+            background: "#1c1c1c",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: 8,
+            boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+            fontFamily: "system-ui, sans-serif",
+            fontSize: 12,
+            color: "#e0e0e0",
           }}
         >
-          <span style={{ fontWeight: 600, fontSize: 13 }}>Settings</span>
-          <button
-            onClick={() => setOpen(false)}
-            aria-label="Close"
-            style={{
-              background: "none",
-              border: "none",
-              color: "#888888",
-              cursor: "pointer",
-              fontSize: 16,
-              lineHeight: 1,
-              padding: "0 2px",
-            }}
-          >
-            ×
-          </button>
-        </div>
-
-        {/* Content */}
-        <div style={{ padding: "12px" }}>
+          {/* Title bar (draggable) */}
           <div
+            onMouseDown={onMouseDown}
+            aria-label="Drag to move Settings panel"
             style={{
+              padding: "8px 12px",
+              cursor: "grab",
+              borderBottom: "1px solid rgba(255,255,255,0.08)",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              gap: 12,
+              userSelect: "none",
             }}
           >
-            <label
-              htmlFor="cssp-css-style-select"
+            <span style={{ fontWeight: 600, fontSize: 13 }}>Settings</span>
+            <button
+              onClick={() => setOpen(false)}
+              aria-label="Close"
               style={{
-                fontSize: 12,
-                color: "#b8b8b8",
-                whiteSpace: "nowrap",
-              }}
-            >
-              CSS Style
-            </label>
-            <select
-              id="cssp-css-style-select"
-              value={cssStyle}
-              onChange={(e) => handleCssStyleChange(e.target.value as CssStyle)}
-              style={{
-                flex: 1,
-                maxWidth: 160,
-                background: "#383838",
-                color: "#e0e0e0",
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: 4,
-                padding: "4px 8px",
-                fontSize: 11,
+                background: "none",
+                border: "none",
+                color: "#888888",
                 cursor: "pointer",
+                fontSize: 16,
+                lineHeight: 1,
+                padding: "0 2px",
               }}
             >
-              <option value="tailwind">Tailwind CSS</option>
-              <option value="general">General CSS</option>
-            </select>
+              ×
+            </button>
+          </div>
+
+          {/* Content */}
+          <div style={{ padding: "12px" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+              }}
+            >
+              <label
+                htmlFor="cssp-css-style-select"
+                style={{
+                  fontSize: 12,
+                  color: "#b8b8b8",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                CSS Style
+              </label>
+              <select
+                id="cssp-css-style-select"
+                value={cssStyle}
+                onChange={(e) =>
+                  handleCssStyleChange(e.target.value as CssStyle)
+                }
+                style={{
+                  flex: 1,
+                  maxWidth: 160,
+                  background: "#383838",
+                  color: "#e0e0e0",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: 4,
+                  padding: "4px 8px",
+                  fontSize: 11,
+                  cursor: "pointer",
+                }}
+              >
+                <option value="tailwind">Tailwind CSS</option>
+                <option value="general">General CSS</option>
+              </select>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
