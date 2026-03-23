@@ -21,12 +21,13 @@
     "test:e2e": "playwright test",
     "b4push": "./scripts/run-b4push.sh",
     "// ── Hooks ───────────────────────────────": "",
-    "prepare": "husky"
+    "prepare": "lefthook install"
   },
   "dependencies": {
-    "@astrojs/node": "^9.5.5",
-    "@astrojs/react": "^4.2.1",
-    "astro": "^5.7.10",
+    "@astrojs/node": "^10.0.3",
+    "@astrojs/react": "^5.0.1",
+    "@zudo-css-playground/design-system": "workspace:*",
+    "astro": "^6.0.8",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
@@ -36,16 +37,13 @@
     "@types/node": "^22.15.0",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
-    "husky": "^9.1.7",
+    "@evilmartians/lefthook": "^1.11.13",
+    "@takazudo/mdx-formatter": "^1.0.3",
     "jsdom": "^29.0.1",
-    "lint-staged": "^15.5.1",
     "prettier": "^3.5.3",
     "tailwindcss": "^4.1.3",
     "typescript": "^5.8.3",
     "vitest": "^4.1.0"
-  },
-  "lint-staged": {
-    "*.{js,ts,tsx,jsx,json,css,md,mdx}": "prettier --write"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

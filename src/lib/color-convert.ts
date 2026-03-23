@@ -58,3 +58,46 @@ export function hslToHex(h: number, s: number, l: number): string {
 export function hslToCssString(h: number, s: number, l: number): string {
   return `hsl(${h} ${s}% ${l}%)`;
 }
+
+/**
+ * Convert hex color to oklch components.
+ * Uses the sRGB → linear-sRGB → XYZ D65 → Oklab → Oklch pipeline.
+ */
+export function hexToOklch(hex: string): { l: number; c: number; h: number } {
+  // Parse hex to linear sRGB
+  const srgbToLinear = (v: number) =>
+    v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+
+  const r = srgbToLinear(parseInt(hex.slice(1, 3), 16) / 255);
+  const g = srgbToLinear(parseInt(hex.slice(3, 5), 16) / 255);
+  const b = srgbToLinear(parseInt(hex.slice(5, 7), 16) / 255);
+
+  // Linear sRGB → XYZ (D65)
+  const x = 0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b;
+  const y = 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b;
+  const z = 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b;
+
+  // XYZ → Oklab
+  const l_ = Math.cbrt(0.2104542553 * x + 0.793617785 * y - 0.0040720468 * z);
+  const m_ = Math.cbrt(0.0259040371 * x + 0.7827717662 * y + 0.0913242472 * z);
+  const s_ = Math.cbrt(0.0412418914 * x + 0.1564275777 * y + 0.8023486819 * z);
+
+  const L = 0.2104542553 * l_ + 0.793617785 * m_ - 0.0040720468 * s_;
+  const a = 1.9779984951 * l_ - 2.428592205 * m_ + 0.4505937099 * s_;
+  const bLab = 0.0259040371 * l_ + 0.7827717662 * m_ - 0.808675766 * s_;
+
+  // Oklab → Oklch
+  const C = Math.sqrt(a * a + bLab * bLab);
+  let H = (Math.atan2(bLab, a) * 180) / Math.PI;
+  if (H < 0) H += 360;
+
+  return {
+    l: Math.round(L * 100) / 100,
+    c: Math.round(C * 100) / 100,
+    h: Math.round(H),
+  };
+}
+
+export function oklchToCss(l: number, c: number, h: number): string {
+  return `oklch(${l} ${c} ${h})`;
+}

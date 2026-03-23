@@ -1,0 +1,11 @@
+pre-commit:
+  parallel: true
+  commands:
+    prettier:
+      glob: "*.{js,ts,tsx,jsx,json,css}"
+      run: npx prettier --write {staged_files} && git add {staged_files}
+      stage_fixed: true
+    mdx-formatter:
+      glob: "*.{md,mdx}"
+      run: npx mdx-formatter {staged_files} && git add {staged_files}
+      stage_fixed: true
