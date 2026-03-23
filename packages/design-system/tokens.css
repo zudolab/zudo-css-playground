@@ -83,32 +83,32 @@
   --breakpoint-xl: 1280px;
 }
 
-/* Default palette (dark theme — Catppuccin Mocha-inspired, oklch) */
+/* Default palette (Default Dark — matches color-tweak-panel default preset) */
 :root {
-  --cssp-bg: oklch(0.21 0.02 281);
-  --cssp-fg: oklch(0.87 0.03 265);
-  --cssp-surface: oklch(0.28 0.02 275);
-  --cssp-muted: oklch(0.52 0.02 265);
-  --cssp-accent: oklch(0.75 0.12 253);
-  --cssp-accent-hover: oklch(0.84 0.07 253);
-  --cssp-success: oklch(0.84 0.14 145);
-  --cssp-danger: oklch(0.73 0.14 11);
-  --cssp-warning: oklch(0.91 0.09 88);
-  --cssp-info: oklch(0.84 0.08 210);
-  --cssp-0: oklch(0.14 0.01 281);
-  --cssp-1: oklch(0.73 0.14 11);
-  --cssp-2: oklch(0.84 0.14 145);
-  --cssp-3: oklch(0.91 0.09 88);
-  --cssp-4: oklch(0.75 0.12 253);
-  --cssp-5: oklch(0.83 0.1 338);
-  --cssp-6: oklch(0.85 0.09 180);
-  --cssp-7: oklch(0.87 0.03 265);
-  --cssp-8: oklch(0.44 0.02 268);
-  --cssp-9: oklch(0.73 0.14 11);
-  --cssp-10: oklch(0.84 0.14 145);
-  --cssp-11: oklch(0.91 0.09 88);
-  --cssp-12: oklch(0.75 0.12 253);
-  --cssp-13: oklch(0.83 0.1 338);
-  --cssp-14: oklch(0.85 0.09 180);
-  --cssp-15: oklch(0.8 0.03 265);
+  --cssp-bg: #181818;
+  --cssp-fg: #b8b8b8;
+  --cssp-surface: #1c1c1c;
+  --cssp-muted: #888888;
+  --cssp-accent: #d69a66;
+  --cssp-accent-hover: #a7c0e3;
+  --cssp-success: #93bb77;
+  --cssp-danger: #da6871;
+  --cssp-warning: #dfbb77;
+  --cssp-info: #5caae9;
+  --cssp-0: #1c1c1c;
+  --cssp-1: #da6871;
+  --cssp-2: #93bb77;
+  --cssp-3: #dfbb77;
+  --cssp-4: #5caae9;
+  --cssp-5: #c074d6;
+  --cssp-6: #90a1b9;
+  --cssp-7: #a0a0a0;
+  --cssp-8: #888888;
+  --cssp-9: #181818;
+  --cssp-10: #383838;
+  --cssp-11: #e0e0e0;
+  --cssp-12: #d69a66;
+  --cssp-13: #c074d6;
+  --cssp-14: #a7c0e3;
+  --cssp-15: #b8b8b8;
 }
