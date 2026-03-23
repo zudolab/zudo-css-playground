@@ -24,7 +24,7 @@ const { title, activeCategory } = Astro.props;
     <div class="flex min-h-screen">
       <aside
         id="sidebar-container"
-        class="w-[250px] shrink-0 bg-surface border-r border-r-muted/20 p-vsp-md"
+        class="w-[250px] shrink-0 overflow-hidden bg-surface border-r border-r-muted/20 p-vsp-md"
         style="transition: margin-left 0.2s ease;"
       >
         <div class="mb-vsp-lg">
@@ -65,9 +65,14 @@ const { title, activeCategory } = Astro.props;
       const STORAGE_KEY = 'cssp-sidebar-collapsed';
       let collapsed = localStorage.getItem(STORAGE_KEY) === 'true';
 
-      function apply() {
+      const SIDEBAR_WIDTH = 250;
+
+      function apply(animate = true) {
+        if (!animate) {
+          sidebar.style.transition = 'none';
+        }
         if (collapsed) {
-          sidebar.style.marginLeft = `-${sidebar.offsetWidth}px`;
+          sidebar.style.marginLeft = `-${SIDEBAR_WIDTH}px`;
           btn.textContent = '▶';
           btn.style.opacity = '0.5';
         } else {
@@ -75,9 +80,14 @@ const { title, activeCategory } = Astro.props;
           btn.textContent = '◀';
           btn.style.opacity = '1';
         }
+        if (!animate) {
+          sidebar.offsetHeight; // force reflow
+          sidebar.style.transition = '';
+        }
       }
 
-      apply();
+      // Apply saved state without animation to avoid flash
+      apply(false);
 
       btn.addEventListener('click', () => {
         collapsed = !collapsed;
