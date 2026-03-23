@@ -7,15 +7,19 @@ export interface ParsedAiResponse {
   sidebarEntry?: { slug: string; label: string; count: number };
 }
 
+function isPlainObject(val: unknown): val is Record<string, unknown> {
+  return typeof val === "object" && val !== null && !Array.isArray(val);
+}
+
 function isStringRecord(val: unknown): val is Record<string, string> {
-  if (typeof val !== "object" || val === null || Array.isArray(val)) return false;
+  if (!isPlainObject(val)) return false;
   return Object.values(val).every((v) => typeof v === "string");
 }
 
 export function isValidSidebarEntry(
   val: unknown,
 ): val is { slug: string; label: string; count: number } {
-  if (typeof val !== "object" || val === null || Array.isArray(val)) return false;
+  if (!isPlainObject(val)) return false;
   const obj = val as Record<string, unknown>;
   return (
     typeof obj.slug === "string" &&

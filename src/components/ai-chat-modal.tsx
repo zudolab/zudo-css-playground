@@ -8,6 +8,20 @@ interface ChatMessage {
   filesWritten?: string[];
 }
 
+async function extractErrorMessage(
+  res: Response,
+  fallback: string,
+): Promise<string> {
+  const text = await res.text().catch(() => "");
+  try {
+    const data = JSON.parse(text);
+    if (data.error) return data.error;
+  } catch {
+    // non-JSON
+  }
+  return fallback;
+}
+
 export default function AiChatModal() {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -77,20 +91,6 @@ export default function AiChatModal() {
 
   const handleReload = () => {
     window.location.reload();
-  };
-
-  const extractErrorMessage = async (
-    res: Response,
-    fallback: string,
-  ): Promise<string> => {
-    const text = await res.text().catch(() => "");
-    try {
-      const data = JSON.parse(text);
-      if (data.error) return data.error;
-    } catch {
-      // non-JSON
-    }
-    return fallback;
   };
 
   const sendMessage = async () => {

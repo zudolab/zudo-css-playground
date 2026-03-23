@@ -402,7 +402,6 @@ export default function ColorTweakPanel() {
         {/* Title bar (draggable) */}
         <div
           onMouseDown={onMouseDown}
-          role="toolbar"
           aria-label="Drag to move Color Tweak panel"
           style={{
             padding: "8px 12px",
