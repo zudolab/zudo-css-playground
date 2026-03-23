@@ -1,7 +1,11 @@
+export type PanelTab = "color" | "typography" | "spacing";
+
 export interface TokenGroup {
   id: string;
   label: string;
   type: "color" | "slider";
+  /** Which panel tab this group belongs to */
+  tab: PanelTab;
   tokens: {
     variable: string;
     label: string;
@@ -25,6 +29,7 @@ export const demoPanelGroups: TokenGroup[] = [
     id: "palette",
     label: "Palette Colors",
     type: "color",
+    tab: "color",
     tokens: [
       {
         variable: "--accent",
@@ -67,6 +72,7 @@ export const demoPanelGroups: TokenGroup[] = [
     id: "status",
     label: "Status Colors",
     type: "color",
+    tab: "color",
     tokens: [
       {
         variable: "--success",
@@ -94,6 +100,7 @@ export const demoPanelGroups: TokenGroup[] = [
     id: "typography",
     label: "Typography",
     type: "slider",
+    tab: "typography",
     tokens: [
       { variable: "--font-sm", label: "Font SM", defaultValue: "0.85" },
       { variable: "--font-md", label: "Font MD", defaultValue: "1" },
@@ -105,6 +112,7 @@ export const demoPanelGroups: TokenGroup[] = [
     id: "spacing",
     label: "Spacing",
     type: "slider",
+    tab: "spacing",
     tokens: [
       { variable: "--space-xs", label: "Space XS", defaultValue: "8" },
       { variable: "--space-sm", label: "Space SM", defaultValue: "12" },
@@ -117,10 +125,16 @@ export const demoPanelGroups: TokenGroup[] = [
     id: "decoration",
     label: "Decoration",
     type: "slider",
+    tab: "spacing",
     tokens: [{ variable: "--radius", label: "Radius", defaultValue: "8" }],
     sliderConfig: { unit: "px", min: 0, max: 24, step: 1 },
   },
 ];
+
+/** Get groups belonging to a specific tab */
+export function getGroupsByTab(tab: PanelTab): TokenGroup[] {
+  return demoPanelGroups.filter((g) => g.tab === tab);
+}
 
 /** Get all color-type groups */
 export function getColorGroups(): TokenGroup[] {

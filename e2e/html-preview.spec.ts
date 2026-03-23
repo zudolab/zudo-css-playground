@@ -6,7 +6,7 @@ test.describe("HTML Preview", () => {
     await expect(page.locator("h1")).toHaveText("CSS Playground");
   });
 
-  test("viewport buttons exist and are clickable", async ({ page }) => {
+  test("page has correct title", async ({ page }) => {
     await page.goto("/", { waitUntil: "networkidle" });
     await expect(page).toHaveTitle(/CSS Playground/);
   });

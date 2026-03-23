@@ -5,13 +5,14 @@ import {
 } from "../lib/iframe-registry";
 import {
   demoPanelGroups,
-  getColorGroups,
+  getGroupsByTab,
   getSliderGroups,
 } from "../lib/token-panel-config";
+import type { PanelTab } from "../lib/token-panel-config";
 import { hexToHsl, hslToHex, hslToCssString } from "../lib/color-convert";
 import HslPicker from "./hsl-picker";
 
-type Tab = "color" | "typography" | "spacing";
+type Tab = PanelTab;
 
 interface DemoTweakState {
   colors: Record<string, string>;
@@ -476,25 +477,22 @@ export default function DemoTweakPanel() {
 
         {/* Tab content */}
         <div style={{ padding: "8px 12px" }}>
-          {tab === "color" && (
-            <>
-              {getColorGroups().map((group, i) => (
-                <div key={group.id}>
-                  {i > 0 && <div style={{ height: 8 }} />}
-                  {renderColorSection(group.label, group.tokens)}
-                </div>
-              ))}
-            </>
-          )}
+          {tab === "color" &&
+            getGroupsByTab("color").map((group, i) => (
+              <div key={group.id}>
+                {i > 0 && <div style={{ height: 8 }} />}
+                {renderColorSection(group.label, group.tokens)}
+              </div>
+            ))}
 
           {tab === "typography" &&
-            getSliderGroups()
-              .filter((g) => g.id === "typography")
+            getGroupsByTab("typography")
+              .filter((g) => g.type === "slider")
               .map(renderSliderGroup)}
 
           {tab === "spacing" &&
-            getSliderGroups()
-              .filter((g) => g.id === "spacing" || g.id === "decoration")
+            getGroupsByTab("spacing")
+              .filter((g) => g.type === "slider")
               .map(renderSliderGroup)}
 
           {/* Reset button */}

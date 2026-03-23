@@ -46,15 +46,28 @@ ${css}
 </head>
 <body>${html}</body>
 <script>
-window.addEventListener("message", function(e) {
-  if (e.data && e.data.type === "cssp-token-override") {
-    var root = document.documentElement;
-    var overrides = e.data.overrides;
-    for (var key in overrides) {
-      root.style.setProperty(key, overrides[key]);
+(function() {
+  var appliedKeys = [];
+  window.addEventListener("message", function(e) {
+    if (e.data && e.data.type === "cssp-token-override") {
+      var root = document.documentElement;
+      var overrides = e.data.overrides;
+      var i;
+      // Remove previously applied keys not in new overrides
+      for (i = 0; i < appliedKeys.length; i++) {
+        if (!(appliedKeys[i] in overrides)) {
+          root.style.removeProperty(appliedKeys[i]);
+        }
+      }
+      // Apply new overrides
+      appliedKeys = [];
+      for (var key in overrides) {
+        root.style.setProperty(key, overrides[key]);
+        appliedKeys.push(key);
+      }
     }
-  }
-});
+  });
+})();
 </script>
 </html>`;
 
@@ -138,7 +151,7 @@ window.addEventListener("message", function(e) {
             maxWidth: "100%",
           }}
           className="border border-muted/20 rounded bg-bg block"
-          sandbox="allow-same-origin"
+          sandbox="allow-same-origin allow-scripts"
         />
       </div>
 
