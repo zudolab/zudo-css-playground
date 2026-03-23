@@ -52,9 +52,14 @@ NEVER use arbitrary hex colors, hsl() values, or pixel values for spacing. EVERY
 CSS-only interactions (no JavaScript).`;
 
 const TAILWIND_CSS_RULES = `
-CRITICAL CSS RULES — generate compact, utility-style CSS.
-Write styles as short single-purpose CSS classes (one property per class where practical), similar to Tailwind's utility approach but as plain CSS. Prefer composing multiple small classes in the HTML rather than writing large multi-property selectors.
-Example: .flex { display: flex } .gap-md { gap: var(--space-md) } .rounded { border-radius: var(--radius) }
+CRITICAL CSS RULES — generate examples using Tailwind CSS v4 utility classes.
+The preview iframe has Tailwind CSS v4 loaded via browser CDN. Use Tailwind utility classes directly in the HTML.
+- Use Tailwind classes for layout, spacing, colors, typography, etc.
+- For custom color values, use arbitrary value syntax: bg-[var(--accent)], text-[var(--fg)], border-[var(--border)]
+- For spacing with tokens: p-[var(--space-md)], gap-[var(--space-sm)], etc.
+- Standard Tailwind spacing (p-4, gap-2, m-4) is also fine for layout
+- Use Tailwind classes: flex, grid, items-center, justify-between, rounded-lg, shadow-md, etc.
+- The css prop should be minimal or empty — put styling in Tailwind classes on the HTML elements
 ${TOKEN_RULES}`;
 
 const GENERAL_CSS_RULES = `

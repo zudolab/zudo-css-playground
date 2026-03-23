@@ -43,12 +43,13 @@ export default function HtmlPreview({
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: system-ui, sans-serif; }
+body { font-family: system-ui, sans-serif; background-color: var(--bg, #fff); color: var(--fg, #222); }
 input, button, textarea, select { font-family: inherit; }
 :focus-visible { outline: 2px solid var(--accent, hsl(220 70% 50%)); outline-offset: 2px; }
 ${baseTokensCss}
 ${css}
 </style>
+<script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
 <body>${html}</body>
 <script>
