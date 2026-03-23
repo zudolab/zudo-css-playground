@@ -79,6 +79,20 @@ export default function AiChatModal() {
     window.location.reload();
   };
 
+  const extractErrorMessage = async (
+    res: Response,
+    fallback: string,
+  ): Promise<string> => {
+    const text = await res.text().catch(() => "");
+    try {
+      const data = JSON.parse(text);
+      if (data.error) return data.error;
+    } catch {
+      // non-JSON
+    }
+    return fallback;
+  };
+
   const sendMessage = async () => {
     const trimmed = input.trim();
     if (!trimmed || loading) return;
@@ -116,15 +130,9 @@ export default function AiChatModal() {
       });
 
       if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        let msg = `Server error ${res.status}`;
-        try {
-          const data = JSON.parse(text);
-          if (data.error) msg = data.error;
-        } catch {
-          // non-JSON
-        }
-        setError(msg);
+        setError(
+          await extractErrorMessage(res, `Server error ${res.status}`),
+        );
       } else {
         const data = await res.json();
         if (data.error) {
@@ -142,15 +150,12 @@ export default function AiChatModal() {
             signal: abort.signal,
           });
           if (!applyRes.ok) {
-            const errText = await applyRes.text().catch(() => "");
-            let errMsg = `Failed to write files (${applyRes.status})`;
-            try {
-              const errData = JSON.parse(errText);
-              if (errData.error) errMsg = errData.error;
-            } catch {
-              // non-JSON
-            }
-            setError(errMsg);
+            setError(
+              await extractErrorMessage(
+                applyRes,
+                `Failed to write files (${applyRes.status})`,
+              ),
+            );
             return;
           }
           const applyData = await applyRes.json();

@@ -19,8 +19,13 @@ export function isValidSidebarEntry(
   const obj = val as Record<string, unknown>;
   return (
     typeof obj.slug === "string" &&
+    obj.slug.length > 0 &&
     typeof obj.label === "string" &&
-    typeof obj.count === "number"
+    obj.label.length > 0 &&
+    typeof obj.count === "number" &&
+    Number.isFinite(obj.count) &&
+    Number.isInteger(obj.count) &&
+    obj.count > 0
   );
 }
 
@@ -42,6 +47,9 @@ export function parseAiResponse(rawResponse: string): ParsedAiResponse {
     return { action: "chat", message: rawResponse };
   }
 
+  const messageStr =
+    typeof parsed.message === "string" ? parsed.message : null;
+
   if (parsed.action === "create_patterns" && isStringRecord(parsed.files)) {
     const validFiles: Record<string, string> = {};
 
@@ -54,17 +62,14 @@ export function parseAiResponse(rawResponse: string): ParsedAiResponse {
     if (Object.keys(validFiles).length === 0) {
       return {
         action: "chat",
-        message:
-          (typeof parsed.message === "string" ? parsed.message : null) ||
-          "No valid files in AI response.",
+        message: messageStr || "No valid files in AI response.",
       };
     }
 
     return {
       action: "pending_files",
       message:
-        (typeof parsed.message === "string" ? parsed.message : null) ||
-        `Created ${Object.keys(validFiles).join(", ")}.`,
+        messageStr || `Created ${Object.keys(validFiles).join(", ")}.`,
       files: validFiles,
       sidebarEntry: isValidSidebarEntry(parsed.sidebarEntry)
         ? parsed.sidebarEntry
@@ -75,8 +80,6 @@ export function parseAiResponse(rawResponse: string): ParsedAiResponse {
   // Regular chat response
   return {
     action: "chat",
-    message:
-      (typeof parsed.message === "string" ? parsed.message : null) ||
-      rawResponse,
+    message: messageStr || rawResponse,
   };
 }

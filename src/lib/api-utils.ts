@@ -1,4 +1,4 @@
-const JSON_HEADERS = { "Content-Type": "application/json" };
+const JSON_HEADERS = { "Content-Type": "application/json" } as const;
 
 export function jsonResponse(
   data: Record<string, unknown>,

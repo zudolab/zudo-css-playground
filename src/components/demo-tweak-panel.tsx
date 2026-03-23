@@ -370,6 +370,8 @@ export default function DemoTweakPanel() {
         {/* Title bar (draggable) */}
         <div
           onMouseDown={onMouseDown}
+          role="toolbar"
+          aria-label="Drag to move Demo Tweak panel"
           style={{
             padding: "8px 12px",
             cursor: "grab",
