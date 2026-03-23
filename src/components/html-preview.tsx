@@ -49,6 +49,17 @@ ${css}
 </style>
 </head>
 <body>${html}</body>
+<script>
+window.addEventListener("message", function(e) {
+  if (e.data && e.data.type === "cssp-token-override") {
+    var root = document.documentElement;
+    var overrides = e.data.overrides;
+    for (var key in overrides) {
+      root.style.setProperty(key, overrides[key]);
+    }
+  }
+});
+</script>
 </html>`;
 
   const measureHeight = useCallback(() => {
