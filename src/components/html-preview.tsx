@@ -31,6 +31,8 @@ export default function HtmlPreview({
   const [userHeight, setUserHeight] = useState<number | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const dragStartRef = useRef<{ y: number; h: number } | null>(null);
+  // Track current display height via ref so handleDragStart needs no state deps
+  const displayHeightRef = useRef(height ?? 200);
 
   const srcdoc = `<!doctype html>
 <html>
@@ -79,33 +81,31 @@ ${css}
     };
   }, [measureHeight]);
 
-  const handleDragStart = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      const startY = e.clientY;
-      const startH = userHeight ?? iframeHeight;
-      dragStartRef.current = { y: startY, h: startH };
+  const handleDragStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const startY = e.clientY;
+    const startH = displayHeightRef.current;
+    dragStartRef.current = { y: startY, h: startH };
 
-      const handleMove = (ev: MouseEvent) => {
-        if (!dragStartRef.current) return;
-        const delta = ev.clientY - dragStartRef.current.y;
-        const newHeight = Math.max(50, dragStartRef.current.h + delta);
-        setUserHeight(newHeight);
-      };
+    const handleMove = (ev: MouseEvent) => {
+      if (!dragStartRef.current) return;
+      const delta = ev.clientY - dragStartRef.current.y;
+      const newHeight = Math.max(50, dragStartRef.current.h + delta);
+      setUserHeight(newHeight);
+    };
 
-      const handleUp = () => {
-        dragStartRef.current = null;
-        window.removeEventListener("mousemove", handleMove);
-        window.removeEventListener("mouseup", handleUp);
-      };
+    const handleUp = () => {
+      dragStartRef.current = null;
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseup", handleUp);
+    };
 
-      window.addEventListener("mousemove", handleMove);
-      window.addEventListener("mouseup", handleUp);
-    },
-    [userHeight, iframeHeight],
-  );
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseup", handleUp);
+  }, []);
 
   const displayHeight = userHeight ?? iframeHeight;
+  displayHeightRef.current = displayHeight;
 
   const viewportButtons: { key: Viewport; label: string }[] = [
     { key: "mobile", label: "Mobile" },

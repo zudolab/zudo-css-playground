@@ -56,7 +56,7 @@ export default function SidebarNav({
             </li>
           );
         })}
-        {filtered.length === 0 && (
+        {filtered.length === 0 && filter && (
           <li className="px-hsp-sm py-vsp-2xs text-small text-muted/50">
             No matches
           </li>

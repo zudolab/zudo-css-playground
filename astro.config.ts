@@ -8,7 +8,13 @@ import rehypeSlug from "rehype-slug";
 
 export default defineConfig({
   adapter: node({ mode: "standalone" }),
-  integrations: [react(), mdx()],
+  integrations: [
+    react(),
+    mdx({
+      remarkPlugins: [remarkGfm],
+      rehypePlugins: [rehypeSlug],
+    }),
+  ],
   markdown: {
     remarkPlugins: [remarkGfm],
     rehypePlugins: [rehypeSlug],

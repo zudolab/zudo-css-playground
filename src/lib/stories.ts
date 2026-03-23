@@ -44,6 +44,7 @@ export function buildCategoryTree(
       if (
         typeof value === "object" &&
         value !== null &&
+        "name" in value &&
         "html" in value &&
         "css" in value
       ) {
