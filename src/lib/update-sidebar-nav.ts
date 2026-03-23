@@ -6,7 +6,9 @@ export function updateSidebarNavContent(
   content: string,
   entry: { slug: string; label: string; count: number },
 ): string {
-  const entryStr = `{ slug: "${entry.slug}", label: "${entry.label}", count: ${entry.count} }`;
+  const safeSlug = entry.slug.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  const safeLabel = entry.label.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  const entryStr = `{ slug: "${safeSlug}", label: "${safeLabel}", count: ${entry.count} }`;
 
   // Check if category already exists — update count
   if (content.includes(`slug: "${entry.slug}"`)) {

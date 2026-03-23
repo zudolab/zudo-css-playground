@@ -50,16 +50,16 @@ export const POST: APIRoute = async ({ request }) => {
     writtenFiles.push(filename);
   }
 
+  const se = sidebarEntry as Record<string, unknown> | undefined;
   if (
-    sidebarEntry &&
-    typeof sidebarEntry === "object" &&
+    se &&
+    typeof se === "object" &&
+    typeof se.slug === "string" &&
+    typeof se.label === "string" &&
+    typeof se.count === "number" &&
     writtenFiles.length > 0
   ) {
-    const entry = sidebarEntry as {
-      slug: string;
-      label: string;
-      count: number;
-    };
+    const entry = { slug: se.slug, label: se.label, count: se.count };
     const navPath = join(PROJECT_ROOT, "src", "components", "sidebar-nav.tsx");
     if (existsSync(navPath)) {
       const content = readFileSync(navPath, "utf-8");

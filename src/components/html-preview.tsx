@@ -55,13 +55,17 @@ window.addEventListener("message", function(e) {
   if (e.data.type === "cssp-token-override") {
     var root = document.documentElement;
     var overrides = e.data.overrides;
+    if (typeof overrides !== "object" || overrides === null) return;
     for (var key in overrides) {
+      if (key.slice(0, 2) !== "--") continue;
       root.style.setProperty(key, overrides[key]);
     }
   } else if (e.data.type === "cssp-token-reset") {
     var root = document.documentElement;
     var keys = e.data.keys;
+    if (!Array.isArray(keys)) return;
     for (var i = 0; i < keys.length; i++) {
+      if (keys[i].slice(0, 2) !== "--") continue;
       root.style.removeProperty(keys[i]);
     }
   }

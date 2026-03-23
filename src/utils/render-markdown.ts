@@ -69,26 +69,38 @@ export function renderMarkdown(src: string): string {
 
       // Unordered list (lines starting with - or *)
       if (/^[-*] /m.test(trimmed)) {
-        const items = trimmed
-          .split("\n")
+        const lines = trimmed.split("\n");
+        const preamble = lines
+          .filter((l) => !/^[-*] /.test(l.trim()))
+          .filter((l) => l.trim());
+        const items = lines
           .filter((l) => /^[-*] /.test(l.trim()))
           .map(
             (l) => `<li>${renderInline(l.trim().replace(/^[-*] /, ""))}</li>`,
           )
           .join("");
-        return `<ul>${items}</ul>`;
+        const prefix = preamble.length
+          ? `<p>${preamble.map(renderInline).join("<br>")}</p>`
+          : "";
+        return `${prefix}<ul>${items}</ul>`;
       }
 
       // Ordered list (lines starting with 1. 2. etc.)
       if (/^\d+\. /m.test(trimmed)) {
-        const items = trimmed
-          .split("\n")
+        const lines = trimmed.split("\n");
+        const preamble = lines
+          .filter((l) => !/^\d+\. /.test(l.trim()))
+          .filter((l) => l.trim());
+        const items = lines
           .filter((l) => /^\d+\. /.test(l.trim()))
           .map(
             (l) => `<li>${renderInline(l.trim().replace(/^\d+\. /, ""))}</li>`,
           )
           .join("");
-        return `<ol>${items}</ol>`;
+        const prefix = preamble.length
+          ? `<p>${preamble.map(renderInline).join("<br>")}</p>`
+          : "";
+        return `${prefix}<ol>${items}</ol>`;
       }
 
       // Heading (# to ###)
