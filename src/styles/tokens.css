@@ -91,3 +91,22 @@ body {
   font-weight: var(--font-weight-bold);
   margin: var(--spacing-vsp-xs) 0 var(--spacing-vsp-2xs);
 }
+
+/* ========================================
+ * Shiki highlighted code (.cssp-highlighted-code)
+ * ======================================== */
+
+.cssp-highlighted-code :where(pre) {
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  font-size: var(--text-caption);
+  line-height: var(--leading-relaxed);
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.cssp-highlighted-code :where(code) {
+  font-family: var(--font-mono);
+}

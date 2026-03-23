@@ -1,12 +1,23 @@
 import { useState, useEffect } from "react";
 import { useDraggable } from "../hooks/use-draggable";
-import { getCssStyle, setCssStyle, type CssStyle } from "../lib/settings-store";
+import {
+  getCssStyle,
+  setCssStyle,
+  getShikiTheme,
+  setShikiTheme,
+  SHIKI_THEMES,
+  type CssStyle,
+  type ShikiTheme,
+} from "../lib/settings-store";
 
 const PANEL_WIDTH = 280;
 
 export default function SettingsPanel() {
   const [open, setOpen] = useState(false);
   const [cssStyle, setCssStyleState] = useState<CssStyle>(() => getCssStyle());
+  const [shikiTheme, setShikiThemeState] = useState<ShikiTheme>(() =>
+    getShikiTheme(),
+  );
   const { position, onMouseDown, recenter } = useDraggable(PANEL_WIDTH);
 
   useEffect(() => {
@@ -18,6 +29,11 @@ export default function SettingsPanel() {
   const handleCssStyleChange = (value: CssStyle) => {
     setCssStyleState(value);
     setCssStyle(value);
+  };
+
+  const handleShikiThemeChange = (value: ShikiTheme) => {
+    setShikiThemeState(value);
+    setShikiTheme(value);
   };
 
   const toggleButton = (
@@ -153,6 +169,52 @@ export default function SettingsPanel() {
               >
                 <option value="tailwind">Tailwind CSS</option>
                 <option value="general">General CSS</option>
+              </select>
+            </div>
+
+            {/* Shiki Theme */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                marginTop: 10,
+              }}
+            >
+              <label
+                htmlFor="cssp-shiki-theme-select"
+                style={{
+                  fontSize: 12,
+                  color: "#b8b8b8",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Code Theme
+              </label>
+              <select
+                id="cssp-shiki-theme-select"
+                value={shikiTheme}
+                onChange={(e) =>
+                  handleShikiThemeChange(e.target.value as ShikiTheme)
+                }
+                style={{
+                  flex: 1,
+                  maxWidth: 160,
+                  background: "#383838",
+                  color: "#e0e0e0",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: 4,
+                  padding: "4px 8px",
+                  fontSize: 11,
+                  cursor: "pointer",
+                }}
+              >
+                {SHIKI_THEMES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
               </select>
             </div>
           </div>

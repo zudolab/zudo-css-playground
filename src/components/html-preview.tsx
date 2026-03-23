@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { generateBaseTokensCss } from "../lib/demo-tokens";
 import { registerIframe, unregisterIframe } from "../lib/iframe-registry";
+import HighlightedCode from "./highlighted-code";
 
 type Viewport = "mobile" | "tablet" | "full";
 
@@ -36,7 +37,8 @@ export default function HtmlPreview({
 
   const baseTokensCss = useMemo(() => generateBaseTokensCss(), []);
 
-  const srcdoc = useMemo(() => `<!doctype html>
+  const srcdoc = useMemo(
+    () => `<!doctype html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -74,7 +76,9 @@ window.addEventListener("message", function(e) {
   }
 });
 </script>
-</html>`, [html, css, baseTokensCss]);
+</html>`,
+    [html, css, baseTokensCss],
+  );
 
   const measureHeight = useCallback(() => {
     const iframe = iframeRef.current;
@@ -216,9 +220,7 @@ window.addEventListener("message", function(e) {
             <div className="mb-vsp-xs">
               <span className="text-caption text-muted font-medium">HTML</span>
             </div>
-            <pre className="text-caption text-fg/80 whitespace-pre-wrap break-words m-0">
-              <code>{html}</code>
-            </pre>
+            <HighlightedCode code={html} language="html" />
             {css && (
               <>
                 <div className="mt-vsp-sm mb-vsp-xs">
@@ -226,9 +228,7 @@ window.addEventListener("message", function(e) {
                     CSS
                   </span>
                 </div>
-                <pre className="text-caption text-fg/80 whitespace-pre-wrap break-words m-0">
-                  <code>{css}</code>
-                </pre>
+                <HighlightedCode code={css} language="css" />
               </>
             )}
           </div>
