@@ -1,3 +1,13 @@
+/** Escape a string for safe interpolation into a JS string literal */
+function escapeForJsString(str: string): string {
+  return str
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r")
+    .replace(/\t/g, "\\t");
+}
+
 /**
  * Pure function that updates sidebar-nav.tsx content string.
  * Adds a new category entry or updates the count of an existing one.
@@ -6,14 +16,16 @@ export function updateSidebarNavContent(
   content: string,
   entry: { slug: string; label: string; count: number },
 ): string {
-  const entryStr = `{ slug: "${entry.slug}", label: "${entry.label}", count: ${entry.count} }`;
+  const safeSlug = escapeForJsString(entry.slug);
+  const safeLabel = escapeForJsString(entry.label);
+  const entryStr = `{ slug: "${safeSlug}", label: "${safeLabel}", count: ${entry.count} }`;
 
-  // Check if category already exists — update count
-  if (content.includes(`slug: "${entry.slug}"`)) {
-    const escapedSlug = entry.slug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const escapedLabel = entry.label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  // Check if category already exists — update count (use escaped values to match content)
+  if (content.includes(`slug: "${safeSlug}"`)) {
+    const regexSlug = safeSlug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regexLabel = safeLabel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const pattern = new RegExp(
-      `\\{ slug: "${escapedSlug}", label: "${escapedLabel}", count: \\d+ \\}`,
+      `\\{ slug: "${regexSlug}", label: "${regexLabel}", count: \\d+ \\}`,
     );
     return content.replace(pattern, entryStr);
   }

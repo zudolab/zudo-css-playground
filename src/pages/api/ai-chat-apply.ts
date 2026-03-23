@@ -5,17 +5,13 @@ import { writeFileSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isValidAstroFilename } from "../../lib/validate-astro-filename";
+import { isValidSidebarEntry } from "../../lib/parse-ai-response";
 import { updateSidebarNavContent } from "../../lib/update-sidebar-nav";
+import { jsonResponse } from "../../lib/api-utils";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const PROJECT_ROOT = join(__dirname, "..", "..", "..");
 const PAGES_DIR = join(PROJECT_ROOT, "src", "pages");
-
-const JSON_HEADERS = { "Content-Type": "application/json" };
-
-function jsonResponse(data: Record<string, unknown>, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: JSON_HEADERS });
-}
 
 /**
  * Writes pending files and updates sidebar.
@@ -50,15 +46,11 @@ export const POST: APIRoute = async ({ request }) => {
     writtenFiles.push(filename);
   }
 
-  if (
-    sidebarEntry &&
-    typeof sidebarEntry === "object" &&
-    writtenFiles.length > 0
-  ) {
-    const entry = sidebarEntry as {
-      slug: string;
-      label: string;
-      count: number;
+  if (isValidSidebarEntry(sidebarEntry) && writtenFiles.length > 0) {
+    const entry = {
+      slug: sidebarEntry.slug,
+      label: sidebarEntry.label,
+      count: sidebarEntry.count,
     };
     const navPath = join(PROJECT_ROOT, "src", "components", "sidebar-nav.tsx");
     if (existsSync(navPath)) {

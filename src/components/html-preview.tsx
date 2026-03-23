@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { generateBaseTokensCss } from "../lib/demo-tokens";
 import { registerIframe, unregisterIframe } from "../lib/iframe-registry";
 
@@ -34,7 +34,9 @@ export default function HtmlPreview({
   // Track current display height via ref so handleDragStart needs no state deps
   const displayHeightRef = useRef(height ?? 200);
 
-  const srcdoc = `<!doctype html>
+  const baseTokensCss = useMemo(() => generateBaseTokensCss(), []);
+
+  const srcdoc = useMemo(() => `<!doctype html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -44,7 +46,7 @@ export default function HtmlPreview({
 body { font-family: system-ui, sans-serif; }
 input, button, textarea, select { font-family: inherit; }
 :focus-visible { outline: 2px solid var(--accent, hsl(220 70% 50%)); outline-offset: 2px; }
-${generateBaseTokensCss()}
+${baseTokensCss}
 ${css}
 </style>
 </head>
@@ -55,19 +57,23 @@ window.addEventListener("message", function(e) {
   if (e.data.type === "cssp-token-override") {
     var root = document.documentElement;
     var overrides = e.data.overrides;
+    if (typeof overrides !== "object" || overrides === null) return;
     for (var key in overrides) {
+      if (key.slice(0, 2) !== "--") continue;
       root.style.setProperty(key, overrides[key]);
     }
   } else if (e.data.type === "cssp-token-reset") {
     var root = document.documentElement;
     var keys = e.data.keys;
+    if (!Array.isArray(keys)) return;
     for (var i = 0; i < keys.length; i++) {
+      if (keys[i].slice(0, 2) !== "--") continue;
       root.style.removeProperty(keys[i]);
     }
   }
 });
 </script>
-</html>`;
+</html>`, [html, css, baseTokensCss]);
 
   const measureHeight = useCallback(() => {
     const iframe = iframeRef.current;
