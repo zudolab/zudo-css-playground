@@ -120,6 +120,19 @@ export const demoPanelGroups: TokenGroup[] = [
     tokens: [{ variable: "--radius", label: "Radius", defaultValue: "8" }],
     sliderConfig: { unit: "px", min: 0, max: 24, step: 1 },
   },
+  {
+    id: "etc",
+    label: "Etc",
+    type: "slider",
+    tokens: [
+      {
+        variable: "--demo-padding",
+        label: "Demo Padding",
+        defaultValue: "16",
+      },
+    ],
+    sliderConfig: { unit: "px", min: 0, max: 64, step: 1 },
+  },
 ];
 
 /** Get all color-type groups */

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { renderMarkdown } from "../utils/render-markdown";
+import { getCssStyle } from "../lib/settings-store";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -125,14 +126,13 @@ export default function AiChatModal() {
             role: m.role,
             content: m.content,
           })),
+          cssStyle: getCssStyle(),
         }),
         signal: abort.signal,
       });
 
       if (!res.ok) {
-        setError(
-          await extractErrorMessage(res, `Server error ${res.status}`),
-        );
+        setError(await extractErrorMessage(res, `Server error ${res.status}`));
       } else {
         const data = await res.json();
         if (data.error) {

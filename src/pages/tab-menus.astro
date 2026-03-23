@@ -1,0 +1,746 @@
+---
+import BaseLayout from '../layouts/base-layout.astro';
+import HtmlPreview from '../components/html-preview.tsx';
+---
+
+<BaseLayout title="Tab Menus" activeCategory="tab-menus">
+  <h1 class="text-heading font-bold mb-vsp-lg">Tab Menu Patterns</h1>
+  <p class="text-body text-muted mb-vsp-xl">10 variations built with strict design tokens.</p>
+  <div class="space-y-vsp-xl">
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">1. Underline Tabs</h2>
+      <HtmlPreview client:visible title="Underline Tabs" html={`<div class="tabs-ul">
+  <input type="radio" id="tab1-1" name="tabs1" value="tab1" checked>
+  <input type="radio" id="tab1-2" name="tabs1" value="tab2">
+  <input type="radio" id="tab1-3" name="tabs1" value="tab3">
+  <div class="tabs-labels">
+    <label for="tab1-1" class="tab-label">Overview</label>
+    <label for="tab1-2" class="tab-label">Details</label>
+    <label for="tab1-3" class="tab-label">Settings</label>
+  </div>
+  <div class="tabs-indicator"></div>
+  <div class="tabs-content">
+    <div class="tab-pane">Overview content goes here</div>
+    <div class="tab-pane">Details content goes here</div>
+    <div class="tab-pane">Settings content goes here</div>
+  </div>
+</div>`} css={`.tabs-ul {
+  position: relative;
+}
+
+.tabs-ul input {
+  display: none;
+}
+
+.tabs-labels {
+  display: flex;
+  gap: var(--space-md);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.tab-label {
+  padding: var(--space-sm) 0;
+  cursor: pointer;
+  color: var(--fg-muted);
+  font-size: var(--font-md);
+  transition: color 200ms;
+  user-select: none;
+}
+
+.tab-label:hover {
+  color: var(--fg);
+}
+
+#tab1-1:checked ~ .tabs-labels > [for="tab1-1"],
+#tab1-2:checked ~ .tabs-labels > [for="tab1-2"],
+#tab1-3:checked ~ .tabs-labels > [for="tab1-3"] {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.tabs-indicator {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: var(--accent);
+  width: calc(100% / 3);
+  transition: transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+#tab1-2:checked ~ .tabs-indicator {
+  transform: translateX(100%);
+}
+
+#tab1-3:checked ~ .tabs-indicator {
+  transform: translateX(200%);
+}
+
+.tabs-content {
+  padding: var(--space-lg) 0;
+}
+
+.tab-pane {
+  display: none;
+  font-size: var(--font-md);
+}
+
+#tab1-1:checked ~ .tabs-content > :nth-child(1),
+#tab1-2:checked ~ .tabs-content > :nth-child(2),
+#tab1-3:checked ~ .tabs-content > :nth-child(3) {
+  display: block;
+}`} height={160} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">2. Pills/Rounded Tabs</h2>
+      <HtmlPreview client:visible title="Pills Tabs" html={`<div class="tabs-pills">
+  <input type="radio" id="tab2-1" name="tabs2" checked>
+  <input type="radio" id="tab2-2" name="tabs2">
+  <input type="radio" id="tab2-3" name="tabs2">
+  <div class="pills-container">
+    <label for="tab2-1" class="pill">Dashboard</label>
+    <label for="tab2-2" class="pill">Analytics</label>
+    <label for="tab2-3" class="pill">Reports</label>
+  </div>
+  <div class="pills-content">
+    <div class="pill-pane">Dashboard widgets and overview</div>
+    <div class="pill-pane">Analytics charts and metrics</div>
+    <div class="pill-pane">Reports and exports</div>
+  </div>
+</div>`} css={`.tabs-pills input {
+  display: none;
+}
+
+.pills-container {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.pill {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-subtle);
+  color: var(--fg-muted);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: var(--font-md);
+  transition: all 200ms;
+  border: 1px solid transparent;
+}
+
+.pill:hover {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+#tab2-1:checked ~ .pills-container > [for="tab2-1"],
+#tab2-2:checked ~ .pills-container > [for="tab2-2"],
+#tab2-3:checked ~ .pills-container > [for="tab2-3"] {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.pills-content {
+  padding: var(--space-md);
+  border-radius: var(--radius);
+  background: var(--bg-subtle);
+}
+
+.pill-pane {
+  display: none;
+  font-size: var(--font-md);
+}
+
+#tab2-1:checked ~ .pills-content > :nth-child(1),
+#tab2-2:checked ~ .pills-content > :nth-child(2),
+#tab2-3:checked ~ .pills-content > :nth-child(3) {
+  display: block;
+}`} height={140} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">3. Icon + Text Tabs</h2>
+      <HtmlPreview client:visible title="Icon Tabs" html={`<div class="tabs-icon">
+  <input type="radio" id="tab3-1" name="tabs3" checked>
+  <input type="radio" id="tab3-2" name="tabs3">
+  <input type="radio" id="tab3-3" name="tabs3">
+  <div class="icon-tabs-nav">
+    <label for="tab3-1" class="icon-tab"><span class="tab-icon">🏠</span> Home</label>
+    <label for="tab3-2" class="icon-tab"><span class="tab-icon">❤️</span> Likes</label>
+    <label for="tab3-3" class="icon-tab"><span class="tab-icon">⚙️</span> Config</label>
+  </div>
+  <div class="icon-tabs-panes">
+    <div class="icon-pane">Home feed and timeline</div>
+    <div class="icon-pane">Your liked items</div>
+    <div class="icon-pane">Configuration options</div>
+  </div>
+</div>`} css={`.tabs-icon input {
+  display: none;
+}
+
+.icon-tabs-nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.icon-tab {
+  flex: 1;
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  cursor: pointer;
+  color: var(--fg-muted);
+  font-size: var(--font-md);
+  transition: all 200ms;
+  border-bottom: 3px solid transparent;
+  text-align: center;
+}
+
+.tab-icon {
+  font-size: 1.5rem;
+}
+
+.icon-tab:hover {
+  background: var(--bg-subtle);
+  color: var(--fg);
+}
+
+#tab3-1:checked ~ .icon-tabs-nav > [for="tab3-1"],
+#tab3-2:checked ~ .icon-tabs-nav > [for="tab3-2"],
+#tab3-3:checked ~ .icon-tabs-nav > [for="tab3-3"] {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.icon-tabs-panes {
+  padding: var(--space-lg);
+}
+
+.icon-pane {
+  display: none;
+  font-size: var(--font-md);
+}
+
+#tab3-1:checked ~ .icon-tabs-panes > :nth-child(1),
+#tab3-2:checked ~ .icon-tabs-panes > :nth-child(2),
+#tab3-3:checked ~ .icon-tabs-panes > :nth-child(3) {
+  display: block;
+}`} height={160} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">4. Vertical Tabs</h2>
+      <HtmlPreview client:visible title="Vertical Tabs" html={`<div class="tabs-vertical" style="display: flex; gap: 2rem;">
+  <input type="radio" id="tab4-1" name="tabs4" checked>
+  <input type="radio" id="tab4-2" name="tabs4">
+  <input type="radio" id="tab4-3" name="tabs4">
+  <div class="vert-nav">
+    <label for="tab4-1" class="vert-tab">Profile</label>
+    <label for="tab4-2" class="vert-tab">Security</label>
+    <label for="tab4-3" class="vert-tab">Billing</label>
+  </div>
+  <div class="vert-content">
+    <div class="vert-pane">User profile information</div>
+    <div class="vert-pane">Security settings</div>
+    <div class="vert-pane">Billing & subscription</div>
+  </div>
+</div>`} css={`.tabs-vertical input {
+  display: none;
+}
+
+.vert-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-right: 1px solid var(--border);
+  min-width: 120px;
+}
+
+.vert-tab {
+  padding: var(--space-md) var(--space-lg);
+  cursor: pointer;
+  color: var(--fg-muted);
+  font-size: var(--font-md);
+  transition: all 200ms;
+  border-right: 3px solid transparent;
+  white-space: nowrap;
+}
+
+.vert-tab:hover {
+  background: var(--bg-subtle);
+  color: var(--fg);
+}
+
+#tab4-1:checked ~ .vert-nav > [for="tab4-1"],
+#tab4-2:checked ~ .vert-nav > [for="tab4-2"],
+#tab4-3:checked ~ .vert-nav > [for="tab4-3"] {
+  color: var(--accent);
+  border-right-color: var(--accent);
+  background: var(--bg-subtle);
+}
+
+.vert-content {
+  flex: 1;
+  padding: var(--space-lg);
+}
+
+.vert-pane {
+  display: none;
+  font-size: var(--font-md);
+  line-height: 1.6;
+}
+
+#tab4-1:checked ~ .vert-content > :nth-child(1),
+#tab4-2:checked ~ .vert-content > :nth-child(2),
+#tab4-3:checked ~ .vert-content > :nth-child(3) {
+  display: block;
+}`} height={160} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">5. Segmented Control</h2>
+      <HtmlPreview client:visible title="Segmented Control" html={`<div class="tabs-segmented">
+  <input type="radio" id="tab5-1" name="tabs5" checked>
+  <input type="radio" id="tab5-2" name="tabs5">
+  <input type="radio" id="tab5-3" name="tabs5">
+  <div class="segment-group">
+    <label for="tab5-1" class="segment">List</label>
+    <label for="tab5-2" class="segment">Grid</label>
+    <label for="tab5-3" class="segment">Cards</label>
+  </div>
+  <div class="segment-content">
+    <div class="seg-pane">List view content</div>
+    <div class="seg-pane">Grid view content</div>
+    <div class="seg-pane">Card view content</div>
+  </div>
+</div>`} css={`.tabs-segmented input {
+  display: none;
+}
+
+.segment-group {
+  display: inline-flex;
+  gap: 0;
+  background: var(--bg-subtle);
+  border-radius: var(--radius);
+  padding: 2px;
+  margin-bottom: var(--space-lg);
+}
+
+.segment {
+  flex: 1;
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  color: var(--fg-muted);
+  background: transparent;
+  font-size: var(--font-md);
+  transition: all 200ms;
+  border-radius: calc(var(--radius) - 2px);
+  text-align: center;
+  min-width: 80px;
+}
+
+.segment:hover {
+  color: var(--fg);
+}
+
+#tab5-1:checked ~ .segment-group > [for="tab5-1"],
+#tab5-2:checked ~ .segment-group > [for="tab5-2"],
+#tab5-3:checked ~ .segment-group > [for="tab5-3"] {
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+}
+
+.segment-content {
+  padding: var(--space-lg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.seg-pane {
+  display: none;
+  font-size: var(--font-md);
+}
+
+#tab5-1:checked ~ .segment-content > :nth-child(1),
+#tab5-2:checked ~ .segment-content > :nth-child(2),
+#tab5-3:checked ~ .segment-content > :nth-child(3) {
+  display: block;
+}`} height={140} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">6. Tabs with Badge Indicators</h2>
+      <HtmlPreview client:visible title="Tabs with Badges" html={`<div class="tabs-badge">
+  <input type="radio" id="tab6-1" name="tabs6" checked>
+  <input type="radio" id="tab6-2" name="tabs6">
+  <input type="radio" id="tab6-3" name="tabs6">
+  <div class="badge-nav">
+    <label for="tab6-1" class="badge-tab">Inbox <span class="badge">5</span></label>
+    <label for="tab6-2" class="badge-tab">Archive <span class="badge" style="background: var(--success);">12</span></label>
+    <label for="tab6-3" class="badge-tab">Spam</label>
+  </div>
+  <div class="badge-content">
+    <div class="badge-pane">5 unread messages</div>
+    <div class="badge-pane">12 archived items</div>
+    <div class="badge-pane">No spam detected</div>
+  </div>
+</div>`} css={`.tabs-badge input {
+  display: none;
+}
+
+.badge-nav {
+  display: flex;
+  gap: var(--space-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.badge-tab {
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  color: var(--fg-muted);
+  font-size: var(--font-md);
+  transition: color 200ms;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.badge {
+  background: var(--danger);
+  color: white;
+  padding: 0 6px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 20px;
+  text-align: center;
+}
+
+.badge-tab:hover {
+  color: var(--fg);
+}
+
+#tab6-1:checked ~ .badge-nav > [for="tab6-1"],
+#tab6-2:checked ~ .badge-nav > [for="tab6-2"],
+#tab6-3:checked ~ .badge-nav > [for="tab6-3"] {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+#tab6-1:checked ~ .badge-nav > [for="tab6-1"]::after,
+#tab6-2:checked ~ .badge-nav > [for="tab6-2"]::after,
+#tab6-3:checked ~ .badge-nav > [for="tab6-3"]::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+}
+
+.badge-content {
+  padding: var(--space-lg) 0;
+}
+
+.badge-pane {
+  display: none;
+  font-size: var(--font-md);
+}
+
+#tab6-1:checked ~ .badge-content > :nth-child(1),
+#tab6-2:checked ~ .badge-content > :nth-child(2),
+#tab6-3:checked ~ .badge-content > :nth-child(3) {
+  display: block;
+}`} height={140} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">7. Filled Background Tabs</h2>
+      <HtmlPreview client:visible title="Filled Tabs" html={`<div class="tabs-filled">
+  <input type="radio" id="tab7-1" name="tabs7" checked>
+  <input type="radio" id="tab7-2" name="tabs7">
+  <input type="radio" id="tab7-3" name="tabs7">
+  <div class="filled-nav">
+    <label for="tab7-1" class="filled-tab">About</label>
+    <label for="tab7-2" class="filled-tab">Team</label>
+    <label for="tab7-3" class="filled-tab">Contact</label>
+  </div>
+  <div class="filled-content">
+    <div class="filled-pane">Company information</div>
+    <div class="filled-pane">Team members</div>
+    <div class="filled-pane">Get in touch</div>
+  </div>
+</div>`} css={`.tabs-filled input {
+  display: none;
+}
+
+.filled-nav {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+}
+
+.filled-tab {
+  padding: var(--space-sm) var(--space-lg);
+  cursor: pointer;
+  color: var(--fg-muted);
+  font-size: var(--font-md);
+  background: var(--bg-subtle);
+  border-radius: var(--radius);
+  transition: all 200ms;
+}
+
+.filled-tab:hover {
+  background: var(--border);
+  color: var(--fg);
+}
+
+#tab7-1:checked ~ .filled-nav > [for="tab7-1"],
+#tab7-2:checked ~ .filled-nav > [for="tab7-2"],
+#tab7-3:checked ~ .filled-nav > [for="tab7-3"] {
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.filled-content {
+  padding: var(--space-lg);
+}
+
+.filled-pane {
+  display: none;
+  font-size: var(--font-md);
+}
+
+#tab7-1:checked ~ .filled-content > :nth-child(1),
+#tab7-2:checked ~ .filled-content > :nth-child(2),
+#tab7-3:checked ~ .filled-content > :nth-child(3) {
+  display: block;
+}`} height={140} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">8. Outlined/Bordered Tabs</h2>
+      <HtmlPreview client:visible title="Outlined Tabs" html={`<div class="tabs-outlined">
+  <input type="radio" id="tab8-1" name="tabs8" checked>
+  <input type="radio" id="tab8-2" name="tabs8">
+  <input type="radio" id="tab8-3" name="tabs8">
+  <div class="outlined-nav">
+    <label for="tab8-1" class="outlined-tab">Code</label>
+    <label for="tab8-2" class="outlined-tab">Preview</label>
+    <label for="tab8-3" class="outlined-tab">Tests</label>
+  </div>
+  <div class="outlined-content">
+    <div class="outlined-pane">Code editor view</div>
+    <div class="outlined-pane">Live preview</div>
+    <div class="outlined-pane">Test results</div>
+  </div>
+</div>`} css={`.tabs-outlined input {
+  display: none;
+}
+
+.outlined-nav {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.outlined-tab {
+  padding: var(--space-sm) var(--space-lg);
+  cursor: pointer;
+  color: var(--fg-muted);
+  font-size: var(--font-md);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 200ms;
+}
+
+.outlined-tab:hover {
+  border-color: var(--fg);
+  color: var(--fg);
+  background: var(--bg-subtle);
+}
+
+#tab8-1:checked ~ .outlined-nav > [for="tab8-1"],
+#tab8-2:checked ~ .outlined-nav > [for="tab8-2"],
+#tab8-3:checked ~ .outlined-nav > [for="tab8-3"] {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.outlined-content {
+  padding: var(--space-lg);
+}
+
+.outlined-pane {
+  display: none;
+  font-size: var(--font-md);
+}
+
+#tab8-1:checked ~ .outlined-content > :nth-child(1),
+#tab8-2:checked ~ .outlined-content > :nth-child(2),
+#tab8-3:checked ~ .outlined-content > :nth-child(3) {
+  display: block;
+}`} height={140} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">9. Full-Width Tabs</h2>
+      <HtmlPreview client:visible title="Full-Width Tabs" html={`<div class="tabs-fullwidth">
+  <input type="radio" id="tab9-1" name="tabs9" checked>
+  <input type="radio" id="tab9-2" name="tabs9">
+  <input type="radio" id="tab9-3" name="tabs9">
+  <div class="fw-nav">
+    <label for="tab9-1" class="fw-tab">Option 1</label>
+    <label for="tab9-2" class="fw-tab">Option 2</label>
+    <label for="tab9-3" class="fw-tab">Option 3</label>
+  </div>
+  <div class="fw-content">
+    <div class="fw-pane">First option content</div>
+    <div class="fw-pane">Second option content</div>
+    <div class="fw-pane">Third option content</div>
+  </div>
+</div>`} css={`.tabs-fullwidth input {
+  display: none;
+}
+
+.fw-nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.fw-tab {
+  flex: 1;
+  padding: var(--space-md);
+  cursor: pointer;
+  color: var(--fg-muted);
+  font-size: var(--font-md);
+  text-align: center;
+  background: transparent;
+  border-bottom: 3px solid transparent;
+  transition: all 200ms;
+}
+
+.fw-tab:hover {
+  background: var(--bg-subtle);
+  color: var(--fg);
+}
+
+#tab9-1:checked ~ .fw-nav > [for="tab9-1"],
+#tab9-2:checked ~ .fw-nav > [for="tab9-2"],
+#tab9-3:checked ~ .fw-nav > [for="tab9-3"] {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+  background: var(--bg-subtle);
+}
+
+.fw-content {
+  padding: var(--space-lg);
+}
+
+.fw-pane {
+  display: none;
+  font-size: var(--font-md);
+}
+
+#tab9-1:checked ~ .fw-content > :nth-child(1),
+#tab9-2:checked ~ .fw-content > :nth-child(2),
+#tab9-3:checked ~ .fw-content > :nth-child(3) {
+  display: block;
+}`} height={140} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">10. Minimal Tabs with Subtle Indicators</h2>
+      <HtmlPreview client:visible title="Minimal Tabs" html={`<div class="tabs-minimal">
+  <input type="radio" id="tab10-1" name="tabs10" checked>
+  <input type="radio" id="tab10-2" name="tabs10">
+  <input type="radio" id="tab10-3" name="tabs10">
+  <div class="minimal-nav">
+    <label for="tab10-1" class="minimal-tab">Feed</label>
+    <label for="tab10-2" class="minimal-tab">Trending</label>
+    <label for="tab10-3" class="minimal-tab">Saved</label>
+  </div>
+  <div class="minimal-content">
+    <div class="minimal-pane">Your personalized feed</div>
+    <div class="minimal-pane">What's trending now</div>
+    <div class="minimal-pane">Your saved items</div>
+  </div>
+</div>`} css={`.tabs-minimal input {
+  display: none;
+}
+
+.minimal-nav {
+  display: flex;
+  gap: var(--space-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.minimal-tab {
+  padding: var(--space-md) 0;
+  cursor: pointer;
+  color: var(--fg-muted);
+  font-size: var(--font-md);
+  font-weight: 400;
+  position: relative;
+  transition: color 200ms;
+}
+
+.minimal-tab:hover {
+  color: var(--fg);
+}
+
+#tab10-1:checked ~ .minimal-nav > [for="tab10-1"],
+#tab10-2:checked ~ .minimal-nav > [for="tab10-2"],
+#tab10-3:checked ~ .minimal-nav > [for="tab10-3"] {
+  color: var(--fg);
+  font-weight: 500;
+}
+
+#tab10-1:checked ~ .minimal-nav > [for="tab10-1"]::after,
+#tab10-2:checked ~ .minimal-nav > [for="tab10-2"]::after,
+#tab10-3:checked ~ .minimal-nav > [for="tab10-3"]::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--fg-muted);
+  opacity: 0.3;
+}
+
+.minimal-content {
+  padding: var(--space-lg) 0;
+}
+
+.minimal-pane {
+  display: none;
+  font-size: var(--font-md);
+  color: var(--fg);
+}
+
+#tab10-1:checked ~ .minimal-content > :nth-child(1),
+#tab10-2:checked ~ .minimal-content > :nth-child(2),
+#tab10-3:checked ~ .minimal-content > :nth-child(3) {
+  display: block;
+}`} height={140} />
+    </section>
+  </div>
+</BaseLayout>

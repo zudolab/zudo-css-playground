@@ -8,17 +8,11 @@ interface TweakState {
   semanticMappings: Record<string, number>;
 }
 
+const DEFAULT_PRESET = "Default Dark";
+// Derived from the default preset to avoid duplication
 const DEFAULT_SEMANTIC_MAPPINGS: Record<string, number> = {
-  bg: 9,
-  fg: 7,
-  surface: 10,
-  muted: 13,
-  accent: 4,
-  accentHover: 11,
-  success: 2,
-  danger: 1,
-  warning: 3,
-  info: 12,
+  bg: 9, fg: 15, surface: 0, muted: 8, accent: 12,
+  accentHover: 14, success: 2, danger: 1, warning: 3, info: 4,
 };
 
 interface PresetDef {
@@ -27,96 +21,64 @@ interface PresetDef {
 }
 
 const PRESETS: Record<string, PresetDef> = {
-  "Catppuccin Mocha": {
+  "Default Dark": {
     palette: [
-      "#11111b",
-      "#f38ba8",
-      "#a6e3a1",
-      "#f9e2af",
-      "#89b4fa",
-      "#f5c2e7",
-      "#94e2d5",
-      "#cdd6f4",
-      "#585b70",
-      "#1e1e2e",
-      "#313244",
-      "#b4d0fb",
-      "#89dceb",
-      "#6c7086",
-      "#94e2d5",
-      "#bac2de",
+      "#1c1c1c",
+      "#da6871",
+      "#93bb77",
+      "#dfbb77",
+      "#5caae9",
+      "#c074d6",
+      "#90a1b9",
+      "#a0a0a0",
+      "#888888",
+      "#181818",
+      "#383838",
+      "#e0e0e0",
+      "#d69a66",
+      "#c074d6",
+      "#a7c0e3",
+      "#b8b8b8",
     ],
     semanticMappings: {
       bg: 9,
-      fg: 7,
-      surface: 10,
-      muted: 13,
-      accent: 4,
-      accentHover: 11,
-      success: 2,
-      danger: 1,
-      warning: 3,
-      info: 12,
-    },
-  },
-  Dracula: {
-    palette: [
-      "#21222c",
-      "#ff5555",
-      "#50fa7b",
-      "#f1fa8c",
-      "#bd93f9",
-      "#ff79c6",
-      "#8be9fd",
-      "#f8f8f2",
-      "#6272a4",
-      "#282a36",
-      "#86878b",
-      "#a4ffff",
-      "#d6acff",
-      "#ff92df",
-      "#69ff94",
-      "#ffffff",
-    ],
-    semanticMappings: {
-      bg: 9,
-      fg: 7,
+      fg: 15,
       surface: 0,
-      muted: 10,
-      accent: 6,
-      accentHover: 11,
+      muted: 8,
+      accent: 12,
+      accentHover: 14,
       success: 2,
       danger: 1,
       warning: 3,
       info: 4,
     },
   },
-  Nord: {
+  "Default Light": {
     palette: [
-      "#2e3440",
-      "#bf616a",
-      "#a3be8c",
-      "#ebcb8b",
-      "#81a1c1",
-      "#b48ead",
-      "#88c0d0",
-      "#e5e9f0",
-      "#4c566a",
-      "#3b4252",
-      "#616e88",
-      "#8fbcbb",
-      "#d8dee9",
-      "#b48ead",
-      "#88c0d0",
-      "#eceff4",
+      "#303030",
+      "#dd3131",
+      "#266538",
+      "#a83838",
+      "#3277c8",
+      "#a35e0f",
+      "#90a1b9",
+      "#7a5218",
+      "#6b6b6b",
+      "#e2ddda",
+      "#ece9e9",
+      "#303030",
+      "#5b99dc",
+      "#b89ee7",
+      "#8590a0",
+      "#654516",
     ],
     semanticMappings: {
-      bg: 0,
-      fg: 12,
-      surface: 9,
-      muted: 10,
-      accent: 6,
-      accentHover: 11,
+      bg: 9,
+      fg: 11,
+      surface: 10,
+      muted: 8,
+      accent: 5,
+      accentHover: 14,
       success: 2,
       danger: 1,
       warning: 3,
@@ -157,7 +119,8 @@ const PANEL_WIDTH = 420;
 function loadState(): { state: TweakState; preset: string } {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    const preset = localStorage.getItem(PRESET_KEY) || "Catppuccin Mocha";
+    const rawPreset = localStorage.getItem(PRESET_KEY) || DEFAULT_PRESET;
+    const preset = rawPreset in PRESETS ? rawPreset : DEFAULT_PRESET;
     if (saved) {
       const parsed = JSON.parse(saved);
       // Migration: convert old format (individual semantic keys) to new format
@@ -175,10 +138,10 @@ function loadState(): { state: TweakState; preset: string } {
   }
   return {
     state: {
-      palette: [...PRESETS["Catppuccin Mocha"].palette],
-      semanticMappings: { ...PRESETS["Catppuccin Mocha"].semanticMappings },
+      palette: [...PRESETS[DEFAULT_PRESET].palette],
+      semanticMappings: { ...PRESETS[DEFAULT_PRESET].semanticMappings },
     },
-    preset: "Catppuccin Mocha",
+    preset: DEFAULT_PRESET,
   };
 }
 
@@ -316,12 +279,12 @@ export default function ColorTweakPanel() {
   };
 
   // Derive colors for panel styling from current state
-  const bgColor = state.palette[state.semanticMappings.bg ?? 0] ?? "#1e1e2e";
-  const fgColor = state.palette[state.semanticMappings.fg ?? 7] ?? "#cdd6f4";
+  const bgColor = state.palette[state.semanticMappings.bg ?? 9] ?? "#181818";
+  const fgColor = state.palette[state.semanticMappings.fg ?? 15] ?? "#b8b8b8";
   const surfaceColor =
-    state.palette[state.semanticMappings.surface ?? 0] ?? "#313244";
+    state.palette[state.semanticMappings.surface ?? 0] ?? "#1c1c1c";
   const mutedColor =
-    state.palette[state.semanticMappings.muted ?? 8] ?? "#6c7086";
+    state.palette[state.semanticMappings.muted ?? 8] ?? "#888888";
 
   // Toggle button (always visible)
   const toggleButton = (
@@ -337,7 +300,7 @@ export default function ColorTweakPanel() {
         borderRadius: "50%",
         border: "2px solid rgba(255,255,255,0.15)",
         background:
-          "linear-gradient(135deg, #89b4fa 0%, #f5c2e7 50%, #a6e3a1 100%)",
+          "linear-gradient(135deg, #5caae9 0%, #c074d6 50%, #93bb77 100%)",
         cursor: "pointer",
         display: "flex",
         alignItems: "center",
@@ -353,15 +316,15 @@ export default function ColorTweakPanel() {
         height="18"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#1e1e2e"
+        stroke="#181818"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       >
         <circle cx="12" cy="12" r="10" />
-        <circle cx="12" cy="8" r="2" fill="#1e1e2e" />
-        <circle cx="8" cy="14" r="2" fill="#1e1e2e" />
-        <circle cx="16" cy="14" r="2" fill="#1e1e2e" />
+        <circle cx="12" cy="8" r="2" fill="#181818" />
+        <circle cx="8" cy="14" r="2" fill="#181818" />
+        <circle cx="16" cy="14" r="2" fill="#181818" />
       </svg>
     </button>
   );

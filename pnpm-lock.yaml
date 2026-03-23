@@ -35,6 +35,9 @@ importers:
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1
+      shiki:
+        specifier: ^4.0.2
+        version: 4.0.2
     devDependencies:
       '@evilmartians/lefthook':
         specifier: ^1.11.13

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { generateBaseTokensCss } from "../lib/demo-tokens";
 import { registerIframe, unregisterIframe } from "../lib/iframe-registry";
+import HighlightedCode from "./highlighted-code";
 
 type Viewport = "mobile" | "tablet" | "full";
 
@@ -36,19 +37,21 @@ export default function HtmlPreview({
 
   const baseTokensCss = useMemo(() => generateBaseTokensCss(), []);
 
-  const srcdoc = useMemo(() => `<!doctype html>
+  const srcdoc = useMemo(
+    () => `<!doctype html>
 <html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: system-ui, sans-serif; }
+body { font-family: system-ui, sans-serif; background-color: var(--bg, #fff); color: var(--fg, #222); padding: var(--demo-padding, 16px); }
 input, button, textarea, select { font-family: inherit; }
 :focus-visible { outline: 2px solid var(--accent, hsl(220 70% 50%)); outline-offset: 2px; }
 ${baseTokensCss}
 ${css}
 </style>
+<script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
 <body>${html}</body>
 <script>
@@ -73,7 +76,9 @@ window.addEventListener("message", function(e) {
   }
 });
 </script>
-</html>`, [html, css, baseTokensCss]);
+</html>`,
+    [html, css, baseTokensCss],
+  );
 
   const measureHeight = useCallback(() => {
     const iframe = iframeRef.current;
@@ -215,9 +220,7 @@ window.addEventListener("message", function(e) {
             <div className="mb-vsp-xs">
               <span className="text-caption text-muted font-medium">HTML</span>
             </div>
-            <pre className="text-caption text-fg/80 whitespace-pre-wrap break-words m-0">
-              <code>{html}</code>
-            </pre>
+            <HighlightedCode code={html} language="html" />
             {css && (
               <>
                 <div className="mt-vsp-sm mb-vsp-xs">
@@ -225,9 +228,7 @@ window.addEventListener("message", function(e) {
                     CSS
                   </span>
                 </div>
-                <pre className="text-caption text-fg/80 whitespace-pre-wrap break-words m-0">
-                  <code>{css}</code>
-                </pre>
+                <HighlightedCode code={css} language="css" />
               </>
             )}
           </div>

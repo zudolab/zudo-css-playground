@@ -1,0 +1,358 @@
+---
+import BaseLayout from '../layouts/base-layout.astro';
+import HtmlPreview from '../components/html-preview.tsx';
+---
+
+<BaseLayout title="Buttons" activeCategory="buttons">
+  <h1 class="text-heading font-bold mb-vsp-lg">Button Patterns</h1>
+  <p class="text-body text-muted mb-vsp-xl">10 button variations built with strict design tokens.</p>
+  <div class="space-y-vsp-xl">
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">1. Primary Button</h2>
+      <HtmlPreview client:visible title="Primary Button" html={`<button class="btn btn-primary">Click me</button>`} css={`.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--vsp-sm) var(--hsp-md);
+  border: none;
+  border-radius: var(--radius);
+  font-size: var(--font-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-primary:focus-visible {
+  outline: var(--focus-ring);
+}`} height={60} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">2. Secondary Button</h2>
+      <HtmlPreview client:visible title="Secondary Button" html={`<button class="btn btn-secondary">Secondary</button>`} css={`.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--vsp-sm) var(--hsp-md);
+  border: none;
+  border-radius: var(--radius);
+  font-size: var(--font-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-secondary {
+  background-color: var(--bg-subtle);
+  color: var(--fg);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background-color: var(--border);
+  color: var(--fg);
+}
+
+.btn-secondary:focus-visible {
+  outline: var(--focus-ring);
+}`} height={60} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">3. Outlined Button</h2>
+      <HtmlPreview client:visible title="Outlined Button" html={`<button class="btn btn-outline">Outline</button>`} css={`.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--vsp-sm) var(--hsp-md);
+  border: none;
+  border-radius: var(--radius);
+  font-size: var(--font-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+}
+
+.btn-outline:hover {
+  background-color: var(--accent);
+  color: white;
+}
+
+.btn-outline:focus-visible {
+  outline: var(--focus-ring);
+}`} height={60} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">4. Ghost Button</h2>
+      <HtmlPreview client:visible title="Ghost Button" html={`<button class="btn btn-ghost">Ghost</button>`} css={`.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--vsp-sm) var(--hsp-md);
+  border: none;
+  border-radius: var(--radius);
+  font-size: var(--font-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--accent);
+  border: none;
+}
+
+.btn-ghost:hover {
+  background-color: rgba(var(--accent-rgb), 0.1);
+  color: var(--accent-hover);
+}
+
+.btn-ghost:focus-visible {
+  outline: var(--focus-ring);
+}`} height={60} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">5. Danger Button</h2>
+      <HtmlPreview client:visible title="Danger Button" html={`<button class="btn btn-danger">Delete</button>`} css={`.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--vsp-sm) var(--hsp-md);
+  border: none;
+  border-radius: var(--radius);
+  font-size: var(--font-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  opacity: 0.9;
+  box-shadow: var(--shadow);
+}
+
+.btn-danger:focus-visible {
+  outline: var(--focus-ring);
+}`} height={60} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">6. Success Button</h2>
+      <HtmlPreview client:visible title="Success Button" html={`<button class="btn btn-success">Confirm</button>`} css={`.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--vsp-sm) var(--hsp-md);
+  border: none;
+  border-radius: var(--radius);
+  font-size: var(--font-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-success {
+  background-color: var(--success);
+  color: white;
+}
+
+.btn-success:hover {
+  opacity: 0.9;
+  box-shadow: var(--shadow);
+}
+
+.btn-success:focus-visible {
+  outline: var(--focus-ring);
+}`} height={60} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">7. Large Button</h2>
+      <HtmlPreview client:visible title="Large Button" html={`<button class="btn btn-primary btn-lg">Large Button</button>`} css={`.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--vsp-sm) var(--hsp-md);
+  border: none;
+  border-radius: var(--radius);
+  font-size: var(--font-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+}
+
+.btn-lg {
+  padding: var(--vsp-md) var(--hsp-lg);
+  font-size: var(--font-lg);
+}
+
+.btn-primary:focus-visible {
+  outline: var(--focus-ring);
+}`} height={80} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">8. Small Button</h2>
+      <HtmlPreview client:visible title="Small Button" html={`<button class="btn btn-primary btn-sm">Small</button>`} css={`.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--vsp-sm) var(--hsp-md);
+  border: none;
+  border-radius: var(--radius);
+  font-size: var(--font-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+}
+
+.btn-sm {
+  padding: var(--vsp-xs) var(--hsp-sm);
+  font-size: var(--font-sm);
+}
+
+.btn-primary:focus-visible {
+  outline: var(--focus-ring);
+}`} height={60} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">9. Icon Button</h2>
+      <HtmlPreview client:visible title="Icon Button" html={`<button class="btn btn-icon" aria-label="Confirm">✓</button>`} css={`.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--vsp-sm) var(--hsp-md);
+  border: none;
+  border-radius: var(--radius);
+  font-size: var(--font-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-icon {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  background-color: var(--accent);
+  color: white;
+  font-size: var(--font-lg);
+}
+
+.btn-icon:hover {
+  background-color: var(--accent-hover);
+  box-shadow: var(--shadow);
+}
+
+.btn-icon:focus-visible {
+  outline: var(--focus-ring);
+}`} height={80} />
+    </section>
+
+    <section>
+      <h2 class="text-subheading font-semibold mb-vsp-sm">10. Button Group</h2>
+      <HtmlPreview client:visible title="Button Group" html={`<div class="btn-group">
+  <button class="btn btn-group-item">Left</button>
+  <button class="btn btn-group-item">Middle</button>
+  <button class="btn btn-group-item">Right</button>
+</div>`} css={`.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--vsp-sm) var(--hsp-md);
+  border: none;
+  border-radius: var(--radius);
+  font-size: var(--font-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-group {
+  display: inline-flex;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.btn-group-item {
+  background-color: var(--bg);
+  color: var(--fg);
+  border: none;
+  border-radius: 0;
+  border-right: 1px solid var(--border);
+}
+
+.btn-group-item:last-child {
+  border-right: none;
+}
+
+.btn-group-item:hover {
+  background-color: var(--bg-subtle);
+}
+
+.btn-group-item:focus-visible {
+  outline: var(--focus-ring);
+}`} height={60} />
+    </section>
+  </div>
+</BaseLayout>

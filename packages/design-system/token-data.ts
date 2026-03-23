@@ -12,6 +12,7 @@ export interface DemoTokenConfig {
     status: DemoToken[];
   };
   typography: DemoToken[];
+  etc: DemoToken[];
   decoration: DemoToken[];
 }
 
@@ -306,6 +307,14 @@ export const demoTokenConfig: DemoTokenConfig = {
       type: "length",
     },
   ],
+  etc: [
+    {
+      variable: "--demo-padding",
+      defaultValue: "16px",
+      label: "Demo Padding",
+      type: "length",
+    },
+  ],
   decoration: [
     {
       variable: "--radius",
@@ -340,6 +349,7 @@ export function getAllTokens(config: DemoTokenConfig): DemoToken[] {
     ...config.colors.palette,
     ...config.colors.status,
     ...config.typography,
+    ...config.etc,
     ...config.decoration,
   ];
 }
