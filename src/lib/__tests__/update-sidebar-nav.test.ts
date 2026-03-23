@@ -1,13 +1,13 @@
 import { describe, it, expect } from "vitest";
 import { updateSidebarNavContent } from "../update-sidebar-nav";
 
-const SINGLE_LINE_EMPTY = `const categories: { slug: string; label: string; count: number }[] = [];
+const SINGLE_LINE_EMPTY = `const aiCategories: { slug: string; label: string; count: number }[] = [];
 
 export default function SidebarNav() {
   return <nav />;
 }`;
 
-const MULTI_LINE_WITH_ENTRIES = `const categories: { slug: string; label: string; count: number }[] = [
+const MULTI_LINE_WITH_ENTRIES = `const aiCategories: { slug: string; label: string; count: number }[] = [
   { slug: "buttons", label: "Buttons", count: 8 },
   { slug: "cards", label: "Cards", count: 5 },
 ];
@@ -16,7 +16,7 @@ export default function SidebarNav() {
   return <nav />;
 }`;
 
-const MULTI_LINE_EMPTY = `const categories: { slug: string; label: string; count: number }[] = [
+const MULTI_LINE_EMPTY = `const aiCategories: { slug: string; label: string; count: number }[] = [
 ];
 
 export default function SidebarNav() {
@@ -59,7 +59,7 @@ describe("updateSidebarNavContent", () => {
   });
 
   it("updates count when slug/label contain regex metacharacters", () => {
-    const content = `const categories: { slug: string; label: string; count: number }[] = [
+    const content = `const aiCategories: { slug: string; label: string; count: number }[] = [
   { slug: "c++-snippets", label: "C++ Snippets", count: 3 },
 ];`;
     const result = updateSidebarNavContent(content, {

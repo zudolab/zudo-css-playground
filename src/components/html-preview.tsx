@@ -28,7 +28,11 @@ export default function HtmlPreview({
   const [viewport, setViewport] = useState<Viewport>("full");
   const [codeOpen, setCodeOpen] = useState(defaultOpen);
   const [iframeHeight, setIframeHeight] = useState(height ?? 200);
+  const [userHeight, setUserHeight] = useState<number | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const dragStartRef = useRef<{ y: number; h: number } | null>(null);
+  // Track current display height via ref so handleDragStart needs no state deps
+  const displayHeightRef = useRef(height ?? 200);
 
   const srcdoc = `<!doctype html>
 <html>
@@ -49,7 +53,7 @@ ${css}
 
   const measureHeight = useCallback(() => {
     const iframe = iframeRef.current;
-    if (!iframe || height) return;
+    if (!iframe || height || userHeight !== null) return;
     try {
       const doc = iframe.contentDocument;
       if (doc?.body) {
@@ -61,7 +65,7 @@ ${css}
     } catch {
       // cross-origin; keep default
     }
-  }, [height]);
+  }, [height, userHeight]);
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -76,6 +80,32 @@ ${css}
       unregisterIframe(iframe);
     };
   }, [measureHeight]);
+
+  const handleDragStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const startY = e.clientY;
+    const startH = displayHeightRef.current;
+    dragStartRef.current = { y: startY, h: startH };
+
+    const handleMove = (ev: MouseEvent) => {
+      if (!dragStartRef.current) return;
+      const delta = ev.clientY - dragStartRef.current.y;
+      const newHeight = Math.max(50, dragStartRef.current.h + delta);
+      setUserHeight(newHeight);
+    };
+
+    const handleUp = () => {
+      dragStartRef.current = null;
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseup", handleUp);
+    };
+
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseup", handleUp);
+  }, []);
+
+  const displayHeight = userHeight ?? iframeHeight;
+  displayHeightRef.current = displayHeight;
 
   const viewportButtons: { key: Viewport; label: string }[] = [
     { key: "mobile", label: "Mobile" },
@@ -117,18 +147,29 @@ ${css}
 
       {/* Preview */}
       <div className="bg-bg p-hsp-md flex justify-center">
-        <iframe
-          ref={iframeRef}
-          srcDoc={srcdoc}
-          title={title || "Preview"}
-          style={{
-            width: viewportWidths[viewport],
-            height: `${iframeHeight}px`,
-            maxWidth: "100%",
-          }}
-          className="border border-muted/20 rounded bg-bg block"
-          sandbox="allow-same-origin"
-        />
+        <div style={{ width: viewportWidths[viewport], maxWidth: "100%" }}>
+          <iframe
+            ref={iframeRef}
+            srcDoc={srcdoc}
+            title={title || "Preview"}
+            style={{
+              width: "100%",
+              height: `${displayHeight}px`,
+            }}
+            className="border border-muted/20 rounded bg-bg block"
+            sandbox="allow-same-origin"
+          />
+          {/* Drag handle */}
+          <div
+            onMouseDown={handleDragStart}
+            className="h-[6px] cursor-row-resize flex items-center justify-center bg-surface hover:bg-accent/10 transition-colors"
+            role="separator"
+            aria-orientation="horizontal"
+            aria-label="Resize preview height"
+          >
+            <div className="w-8 h-[2px] rounded bg-muted/40" />
+          </div>
+        </div>
       </div>
 
       {/* Code */}

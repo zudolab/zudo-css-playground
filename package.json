@@ -24,12 +24,15 @@
     "prepare": "lefthook install"
   },
   "dependencies": {
+    "@astrojs/mdx": "^4.3.14",
     "@astrojs/node": "^10.0.3",
     "@astrojs/react": "^5.0.1",
     "@zudo-css-playground/design-system": "workspace:*",
     "astro": "^6.0.8",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "rehype-slug": "^6.0.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
