@@ -51,11 +51,18 @@ ${css}
 <body>${html}</body>
 <script>
 window.addEventListener("message", function(e) {
-  if (e.data && e.data.type === "cssp-token-override") {
+  if (!e.data) return;
+  if (e.data.type === "cssp-token-override") {
     var root = document.documentElement;
     var overrides = e.data.overrides;
     for (var key in overrides) {
       root.style.setProperty(key, overrides[key]);
+    }
+  } else if (e.data.type === "cssp-token-reset") {
+    var root = document.documentElement;
+    var keys = e.data.keys;
+    for (var i = 0; i < keys.length; i++) {
+      root.style.removeProperty(keys[i]);
     }
   }
 });
@@ -92,6 +99,16 @@ window.addEventListener("message", function(e) {
     };
   }, [measureHeight]);
 
+  // Store drag cleanup function for unmount safety
+  const dragCleanupRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    return () => {
+      // Clean up drag listeners if component unmounts mid-drag
+      dragCleanupRef.current?.();
+    };
+  }, []);
+
   const handleDragStart = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     const startY = e.clientY;
@@ -107,12 +124,14 @@ window.addEventListener("message", function(e) {
 
     const handleUp = () => {
       dragStartRef.current = null;
+      dragCleanupRef.current = null;
       window.removeEventListener("mousemove", handleMove);
       window.removeEventListener("mouseup", handleUp);
     };
 
     window.addEventListener("mousemove", handleMove);
     window.addEventListener("mouseup", handleUp);
+    dragCleanupRef.current = handleUp;
   }, []);
 
   const displayHeight = userHeight ?? iframeHeight;
@@ -168,7 +187,7 @@ window.addEventListener("message", function(e) {
               height: `${displayHeight}px`,
             }}
             className="border border-muted/20 rounded bg-bg block"
-            sandbox="allow-same-origin"
+            sandbox="allow-same-origin allow-scripts"
           />
           {/* Drag handle */}
           <div

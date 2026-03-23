@@ -164,7 +164,7 @@ describe("iframe-registry", () => {
       });
     });
 
-    it("sends empty overrides via postMessage on reset", () => {
+    it("sends reset message via postMessage on reset", () => {
       const iframe = createMockIframe();
       domIframes = [iframe];
       setGlobalOverrides({ "--accent": "red" });
@@ -172,8 +172,8 @@ describe("iframe-registry", () => {
       resetGlobalOverrides();
       expect(iframe.__messages).toHaveLength(1);
       expect(iframe.__messages[0]).toEqual({
-        type: "cssp-token-override",
-        overrides: {},
+        type: "cssp-token-reset",
+        keys: ["--accent"],
       });
     });
   });

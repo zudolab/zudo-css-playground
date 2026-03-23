@@ -15,10 +15,16 @@
 
 const OVERRIDES_KEY = "__demoTokenOverrides";
 export const TOKEN_MESSAGE_TYPE = "cssp-token-override";
+export const TOKEN_RESET_MESSAGE_TYPE = "cssp-token-reset";
 
 export interface TokenOverrideMessage {
   type: typeof TOKEN_MESSAGE_TYPE;
   overrides: Record<string, string>;
+}
+
+export interface TokenResetMessage {
+  type: typeof TOKEN_RESET_MESSAGE_TYPE;
+  keys: string[];
 }
 
 function postOverridesToIframe(
@@ -114,7 +120,17 @@ export function resetGlobalOverrides(): void {
     } catch {
       // cross-origin iframe — skip
     }
-    // Also notify via postMessage with empty overrides
-    postOverridesToIframe(iframe, {});
+    // Also notify via postMessage to remove properties
+    try {
+      iframe.contentWindow?.postMessage(
+        {
+          type: TOKEN_RESET_MESSAGE_TYPE,
+          keys: keysToRemove,
+        } satisfies TokenResetMessage,
+        "*",
+      );
+    } catch {
+      // iframe not ready
+    }
   }
 }

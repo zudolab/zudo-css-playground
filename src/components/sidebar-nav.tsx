@@ -32,6 +32,7 @@ export default function SidebarNav({
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder="Filter categories..."
+          aria-label="Filter categories"
           className="w-full px-hsp-sm py-vsp-2xs rounded text-small bg-bg border border-muted/20 text-fg placeholder:text-muted/50 outline-none focus:border-accent/50"
         />
       </div>

@@ -24,7 +24,7 @@
     "prepare": "lefthook install"
   },
   "dependencies": {
-    "@astrojs/mdx": "^4.3.14",
+    "@astrojs/mdx": "^5.0.2",
     "@astrojs/node": "^10.0.3",
     "@astrojs/react": "^5.0.1",
     "@zudo-css-playground/design-system": "workspace:*",
