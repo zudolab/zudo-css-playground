@@ -125,7 +125,8 @@ const PANEL_WIDTH = 420;
 function loadState(): { state: TweakState; preset: string } {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    const preset = localStorage.getItem(PRESET_KEY) || "Default Dark";
+    const rawPreset = localStorage.getItem(PRESET_KEY) || "Default Dark";
+    const preset = rawPreset in PRESETS ? rawPreset : "Default Dark";
     if (saved) {
       const parsed = JSON.parse(saved);
       // Migration: convert old format (individual semantic keys) to new format
@@ -284,12 +285,12 @@ export default function ColorTweakPanel() {
   };
 
   // Derive colors for panel styling from current state
-  const bgColor = state.palette[state.semanticMappings.bg ?? 0] ?? "#1e1e2e";
-  const fgColor = state.palette[state.semanticMappings.fg ?? 7] ?? "#cdd6f4";
+  const bgColor = state.palette[state.semanticMappings.bg ?? 9] ?? "#181818";
+  const fgColor = state.palette[state.semanticMappings.fg ?? 15] ?? "#b8b8b8";
   const surfaceColor =
-    state.palette[state.semanticMappings.surface ?? 0] ?? "#313244";
+    state.palette[state.semanticMappings.surface ?? 0] ?? "#1c1c1c";
   const mutedColor =
-    state.palette[state.semanticMappings.muted ?? 8] ?? "#6c7086";
+    state.palette[state.semanticMappings.muted ?? 8] ?? "#888888";
 
   // Toggle button (always visible)
   const toggleButton = (
