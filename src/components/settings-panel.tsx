@@ -27,7 +27,7 @@ export default function SettingsPanel() {
         position: "fixed",
         top: 12,
         right: 100,
-        zIndex: 10000,
+        zIndex: 10001,
         width: 36,
         height: 36,
         borderRadius: "50%",
@@ -43,6 +43,7 @@ export default function SettingsPanel() {
         padding: 0,
       }}
       title="Toggle Settings Panel"
+      aria-label="Toggle Settings Panel"
     >
       <svg
         width="18"
@@ -69,7 +70,7 @@ export default function SettingsPanel() {
             position: "fixed",
             left: position.x,
             top: position.y,
-            zIndex: 9999,
+            zIndex: 10000,
             width: PANEL_WIDTH,
             background: "#1c1c1c",
             border: "1px solid rgba(255,255,255,0.1)",

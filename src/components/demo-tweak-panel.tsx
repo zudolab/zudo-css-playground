@@ -159,7 +159,7 @@ export default function DemoTweakPanel() {
     fontSize: 10,
     textTransform: "uppercase",
     letterSpacing: "0.05em",
-    color: "#6c7086",
+    color: "#888888",
     marginBottom: 6,
     marginTop: 8,
     fontWeight: 600,
@@ -206,7 +206,7 @@ export default function DemoTweakPanel() {
                 flexShrink: 0,
               }}
             />
-            <span style={{ fontSize: 11, color: "#a6adc8" }}>
+            <span style={{ fontSize: 11, color: "#b8b8b8" }}>
               {token.label}
             </span>
           </div>
@@ -249,7 +249,7 @@ export default function DemoTweakPanel() {
                 marginBottom: 4,
               }}
             >
-              <span style={{ fontSize: 11, color: "#a6adc8" }}>
+              <span style={{ fontSize: 11, color: "#b8b8b8" }}>
                 {token.label}
               </span>
               <input
@@ -263,8 +263,8 @@ export default function DemoTweakPanel() {
                 }}
                 style={{
                   width: 60,
-                  background: "#313244",
-                  color: "#cdd6f4",
+                  background: "#383838",
+                  color: "#e0e0e0",
                   border: "1px solid rgba(255,255,255,0.1)",
                   borderRadius: 3,
                   padding: "1px 4px",
@@ -290,7 +290,7 @@ export default function DemoTweakPanel() {
                 width: "100%",
                 height: 6,
                 cursor: "pointer",
-                accentColor: "#89b4fa",
+                accentColor: "#d69a66",
               }}
             />
           </div>
@@ -313,7 +313,7 @@ export default function DemoTweakPanel() {
         borderRadius: "50%",
         border: "2px solid rgba(255,255,255,0.15)",
         background:
-          "linear-gradient(135deg, #f9e2af 0%, #94e2d5 50%, #89b4fa 100%)",
+          "linear-gradient(135deg, #dfbb77 0%, #93bb77 50%, #d69a66 100%)",
         cursor: "pointer",
         display: "flex",
         alignItems: "center",
@@ -329,7 +329,7 @@ export default function DemoTweakPanel() {
         height="18"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#1e1e2e"
+        stroke="#1c1c1c"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -337,9 +337,9 @@ export default function DemoTweakPanel() {
         <line x1="3" y1="6" x2="21" y2="6" />
         <line x1="3" y1="12" x2="21" y2="12" />
         <line x1="3" y1="18" x2="21" y2="18" />
-        <circle cx="8" cy="6" r="2" fill="#1e1e2e" />
-        <circle cx="16" cy="12" r="2" fill="#1e1e2e" />
-        <circle cx="10" cy="18" r="2" fill="#1e1e2e" />
+        <circle cx="8" cy="6" r="2" fill="#1c1c1c" />
+        <circle cx="16" cy="12" r="2" fill="#1c1c1c" />
+        <circle cx="10" cy="18" r="2" fill="#1c1c1c" />
       </svg>
     </button>
   );
@@ -358,13 +358,13 @@ export default function DemoTweakPanel() {
           width: DEMO_PANEL_WIDTH,
           maxHeight: "calc(100vh - 32px)",
           overflowY: "auto",
-          background: "#313244",
+          background: "#383838",
           border: "1px solid rgba(255,255,255,0.1)",
           borderRadius: 8,
           boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
           fontFamily: "system-ui, sans-serif",
           fontSize: 12,
-          color: "#cdd6f4",
+          color: "#e0e0e0",
         }}
       >
         {/* Title bar (draggable) */}
@@ -388,7 +388,7 @@ export default function DemoTweakPanel() {
             style={{
               background: "none",
               border: "none",
-              color: "#6c7086",
+              color: "#888888",
               cursor: "pointer",
               fontSize: 16,
               lineHeight: 1,
@@ -415,11 +415,11 @@ export default function DemoTweakPanel() {
                 padding: "6px 0",
                 fontSize: 11,
                 fontWeight: tab === t.key ? 600 : 400,
-                color: tab === t.key ? "#89b4fa" : "#6c7086",
+                color: tab === t.key ? "#d69a66" : "#888888",
                 background: "none",
                 border: "none",
                 borderBottom:
-                  tab === t.key ? "2px solid #89b4fa" : "2px solid transparent",
+                  tab === t.key ? "2px solid #d69a66" : "2px solid transparent",
                 cursor: "pointer",
               }}
             >
@@ -457,8 +457,8 @@ export default function DemoTweakPanel() {
               onClick={handleReset}
               style={{
                 width: "100%",
-                background: "#1e1e2e",
-                color: "#6c7086",
+                background: "#1c1c1c",
+                color: "#888888",
                 border: "1px solid rgba(255,255,255,0.1)",
                 borderRadius: 4,
                 padding: "5px 8px",

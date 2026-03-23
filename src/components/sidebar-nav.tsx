@@ -1,7 +1,9 @@
 import { useState } from "react";
 
 // Static categories populated by AI chat (update-sidebar-nav.ts still works)
-const aiCategories: { slug: string; label: string; count: number }[] = [];
+const aiCategories: { slug: string; label: string; count: number }[] = [
+  { slug: "header-menus", label: "Header Menus", count: 10 },
+];
 
 interface Props {
   activeCategory?: string;

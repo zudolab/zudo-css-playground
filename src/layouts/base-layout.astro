@@ -50,51 +50,81 @@ const { title, activeCategory } = Astro.props;
         id="sidebar-toggle"
         type="button"
         title="Toggle sidebar"
-        style="position: fixed; bottom: 16px; left: 16px; z-index: 100; width: 56px; height: 56px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); background: rgba(30,28,26,0.95); color: #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; line-height: 1; padding: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.5); backdrop-filter: blur(8px); transition: background 0.2s, border-color 0.2s, transform 0.15s;"
-        onmouseenter="this.style.borderColor='rgba(255,255,255,0.5)';this.style.background='rgba(50,48,46,0.95)';this.style.transform='scale(1.05)'"
-        onmouseleave="this.style.borderColor='rgba(255,255,255,0.3)';this.style.background='rgba(30,28,26,0.95)';this.style.transform='scale(1)'"
+        aria-label="Toggle sidebar"
+        aria-expanded="true"
       >
         ◀
       </button>
+      <style>
+        #sidebar-toggle {
+          position: fixed;
+          bottom: 16px;
+          left: 16px;
+          z-index: 100;
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          border: 2px solid rgba(255,255,255,0.3);
+          background: rgba(30,28,26,0.95);
+          color: #ccc;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 24px;
+          line-height: 1;
+          padding: 0;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+          backdrop-filter: blur(8px);
+          transition: background 0.2s, border-color 0.2s, transform 0.15s;
+        }
+        #sidebar-toggle:hover,
+        #sidebar-toggle:focus-visible {
+          border-color: rgba(255,255,255,0.5);
+          background: rgba(50,48,46,0.95);
+          transform: scale(1.05);
+        }
+      </style>
     </div>
     <ColorTweakPanel client:idle />
     <DemoTweakPanel client:idle />
     <SettingsPanel client:idle />
     <AiChatModal client:load />
-    <script>
-      const btn = document.getElementById('sidebar-toggle')!;
-      const sidebar = document.getElementById('sidebar-container')!;
-      const STORAGE_KEY = 'cssp-sidebar-collapsed';
-      let collapsed = localStorage.getItem(STORAGE_KEY) === 'true';
+    <script is:inline>
+      var btn = document.getElementById('sidebar-toggle');
+      var sidebar = document.getElementById('sidebar-container');
+      var STORAGE_KEY = 'cssp-sidebar-collapsed';
+      var collapsed = localStorage.getItem(STORAGE_KEY) === 'true';
 
-      const SIDEBAR_WIDTH = 250;
+      var SIDEBAR_WIDTH = 250;
 
-      function apply(animate = true) {
+      function apply(animate) {
         if (!animate) {
           sidebar.style.transition = 'none';
         }
         if (collapsed) {
-          sidebar.style.marginLeft = `-${SIDEBAR_WIDTH}px`;
-          btn.textContent = '▶';
+          sidebar.style.marginLeft = '-' + SIDEBAR_WIDTH + 'px';
+          btn.textContent = '\u25B6';
           btn.style.opacity = '0.5';
+          btn.setAttribute('aria-expanded', 'false');
         } else {
           sidebar.style.marginLeft = '0';
-          btn.textContent = '◀';
+          btn.textContent = '\u25C0';
           btn.style.opacity = '1';
+          btn.setAttribute('aria-expanded', 'true');
         }
         if (!animate) {
-          sidebar.offsetHeight; // force reflow
+          sidebar.offsetHeight;
           sidebar.style.transition = '';
         }
       }
 
-      // Apply saved state without animation to avoid flash
       apply(false);
 
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', function() {
         collapsed = !collapsed;
         localStorage.setItem(STORAGE_KEY, String(collapsed));
-        apply();
+        apply(true);
       });
     </script>
   </body>

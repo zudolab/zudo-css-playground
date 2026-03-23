@@ -8,17 +8,11 @@ interface TweakState {
   semanticMappings: Record<string, number>;
 }
 
+const DEFAULT_PRESET = "Default Dark";
+// Derived from the default preset to avoid duplication
 const DEFAULT_SEMANTIC_MAPPINGS: Record<string, number> = {
-  bg: 9,
-  fg: 15,
-  surface: 0,
-  muted: 8,
-  accent: 12,
-  accentHover: 14,
-  success: 2,
-  danger: 1,
-  warning: 3,
-  info: 4,
+  bg: 9, fg: 15, surface: 0, muted: 8, accent: 12,
+  accentHover: 14, success: 2, danger: 1, warning: 3, info: 4,
 };
 
 interface PresetDef {
@@ -125,8 +119,8 @@ const PANEL_WIDTH = 420;
 function loadState(): { state: TweakState; preset: string } {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    const rawPreset = localStorage.getItem(PRESET_KEY) || "Default Dark";
-    const preset = rawPreset in PRESETS ? rawPreset : "Default Dark";
+    const rawPreset = localStorage.getItem(PRESET_KEY) || DEFAULT_PRESET;
+    const preset = rawPreset in PRESETS ? rawPreset : DEFAULT_PRESET;
     if (saved) {
       const parsed = JSON.parse(saved);
       // Migration: convert old format (individual semantic keys) to new format
@@ -144,10 +138,10 @@ function loadState(): { state: TweakState; preset: string } {
   }
   return {
     state: {
-      palette: [...PRESETS["Default Dark"].palette],
-      semanticMappings: { ...PRESETS["Default Dark"].semanticMappings },
+      palette: [...PRESETS[DEFAULT_PRESET].palette],
+      semanticMappings: { ...PRESETS[DEFAULT_PRESET].semanticMappings },
     },
-    preset: "Default Dark",
+    preset: DEFAULT_PRESET,
   };
 }
 

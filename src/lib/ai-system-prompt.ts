@@ -35,27 +35,8 @@ import HtmlPreview from '../components/html-preview.tsx';
   </div>
 </BaseLayout>`;
 
-const TAILWIND_CSS_RULES = `
-CRITICAL CSS RULES — generate examples using Tailwind CSS utility classes:
-- Use Tailwind utility classes directly in the HTML (e.g., class="flex items-center gap-4 p-4 rounded-lg bg-[var(--bg)] text-[var(--fg)]")
-- Color values MUST reference token variables via arbitrary value syntax: bg-[var(--accent)], text-[var(--fg)], border-[var(--border)]
-- Spacing: use Tailwind spacing (p-2, gap-4, m-4 etc.) or token variables via arbitrary values
-- Typography: use Tailwind text sizes or token variables
-- Use Tailwind classes for layout (flex, grid), borders (rounded-lg, border), shadows (shadow-md), etc.
-- Token variables for colors: var(--accent), var(--accent-hover), var(--fg), var(--fg-muted), var(--bg), var(--bg-subtle), var(--border)
-- Status colors: var(--success), var(--danger), var(--warning), var(--info)
-- Radius: var(--radius) (8px)
-- Shadows: var(--shadow), var(--shadow-strong)
-- Focus: var(--focus-ring)
-- Font: font-family: system-ui, sans-serif (already set by iframe)
-- Form controls inherit font (already set by iframe)
-- :focus-visible outline already set by iframe
-
-NEVER use arbitrary hex colors or hsl() values for colors. Color values MUST come from token variables.
-Minimal custom CSS — prefer Tailwind classes. Only use custom CSS when Tailwind cannot express the pattern.`;
-
-const GENERAL_CSS_RULES = `
-CRITICAL CSS RULES — every pattern CSS MUST use these token variables:
+const TOKEN_RULES = `
+Available token variables:
 - Spacing: var(--space-xs) (8px), var(--space-sm) (12px), var(--space-md) (20px), var(--space-lg) (32px)
 - Colors: var(--accent), var(--accent-hover), var(--fg), var(--fg-muted), var(--bg), var(--bg-subtle), var(--border)
 - Status: var(--success), var(--danger), var(--warning), var(--info)
@@ -68,7 +49,18 @@ CRITICAL CSS RULES — every pattern CSS MUST use these token variables:
 - :focus-visible outline already set by iframe
 
 NEVER use arbitrary hex colors, hsl() values, or pixel values for spacing. EVERY value must come from a token variable.
-Use BEM-ish class names. CSS-only interactions (no JavaScript).`;
+CSS-only interactions (no JavaScript).`;
+
+const TAILWIND_CSS_RULES = `
+CRITICAL CSS RULES — generate compact, utility-style CSS.
+Write styles as short single-purpose CSS classes (one property per class where practical), similar to Tailwind's utility approach but as plain CSS. Prefer composing multiple small classes in the HTML rather than writing large multi-property selectors.
+Example: .flex { display: flex } .gap-md { gap: var(--space-md) } .rounded { border-radius: var(--radius) }
+${TOKEN_RULES}`;
+
+const GENERAL_CSS_RULES = `
+CRITICAL CSS RULES — generate structured CSS with BEM-ish class naming.
+Write organized CSS with descriptive class names (e.g., .card, .card__header, .card--highlighted). Each selector groups all related properties together. Prefer semantic naming that describes the component structure.
+${TOKEN_RULES}`;
 
 const CHAT_FALLBACK = `
 
