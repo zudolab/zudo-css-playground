@@ -6,7 +6,8 @@ import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseAiResponse } from "../../lib/parse-ai-response";
-import { SYSTEM_PROMPT } from "../../lib/ai-system-prompt";
+import { getSystemPrompt } from "../../lib/ai-system-prompt";
+import type { CssStyle } from "../../lib/settings-store";
 import { jsonResponse } from "../../lib/api-utils";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
@@ -61,7 +62,8 @@ export const POST: APIRoute = async ({ request }) => {
   } catch {
     return jsonResponse({ error: "Invalid JSON" }, 400);
   }
-  const { message, history } = body;
+  const { message, history, cssStyle: rawCssStyle } = body;
+  const cssStyle: CssStyle = rawCssStyle === "general" ? "general" : "tailwind";
 
   if (typeof message !== "string" || !message.trim()) {
     return jsonResponse({ error: "message required" }, 400);
@@ -107,7 +109,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   inFlight = true;
   try {
-    const rawResponse = await callClaude(fullPrompt);
+    const rawResponse = await callClaude(fullPrompt, cssStyle);
     const result = parseAiResponse(rawResponse);
 
     if (result.action === "pending_files") {
@@ -134,7 +136,10 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
-async function callClaude(prompt: string): Promise<string> {
+async function callClaude(
+  prompt: string,
+  cssStyle: CssStyle = "tailwind",
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const proc = spawn(
       "claude",
@@ -145,7 +150,7 @@ async function callClaude(prompt: string): Promise<string> {
         "--max-budget-usd",
         "0.50",
         "--system-prompt",
-        SYSTEM_PROMPT,
+        getSystemPrompt(cssStyle),
       ],
       { stdio: ["pipe", "pipe", "pipe"] },
     );
