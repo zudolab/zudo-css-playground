@@ -23,7 +23,11 @@ const { title, activeCategory } = Astro.props;
   </head>
   <body class="min-h-screen">
     <div class="flex min-h-screen">
-      <aside class="w-[250px] shrink-0 bg-surface border-r border-r-muted/20 p-vsp-md">
+      <aside
+        id="sidebar-container"
+        class="w-[250px] shrink-0 overflow-hidden bg-surface border-r border-r-muted/20 p-vsp-md"
+        style="transition: margin-left 0.2s ease;"
+      >
         <div class="mb-vsp-lg">
           <a href="/" class="text-subheading font-bold text-accent no-underline">
             CSS Playground
@@ -42,10 +46,56 @@ const { title, activeCategory } = Astro.props;
       <main class="flex-1 p-vsp-xl overflow-auto">
         <slot />
       </main>
+      <button
+        id="sidebar-toggle"
+        type="button"
+        title="Toggle sidebar"
+        style="position: fixed; bottom: 16px; left: 16px; z-index: 100; width: 56px; height: 56px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); background: rgba(30,28,26,0.95); color: #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; line-height: 1; padding: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.5); backdrop-filter: blur(8px); transition: background 0.2s, border-color 0.2s, transform 0.15s;"
+        onmouseenter="this.style.borderColor='rgba(255,255,255,0.5)';this.style.background='rgba(50,48,46,0.95)';this.style.transform='scale(1.05)'"
+        onmouseleave="this.style.borderColor='rgba(255,255,255,0.3)';this.style.background='rgba(30,28,26,0.95)';this.style.transform='scale(1)'"
+      >
+        ◀
+      </button>
     </div>
     <ColorTweakPanel client:idle />
     <DemoTweakPanel client:idle />
     <SettingsPanel client:idle />
     <AiChatModal client:load />
+    <script>
+      const btn = document.getElementById('sidebar-toggle')!;
+      const sidebar = document.getElementById('sidebar-container')!;
+      const STORAGE_KEY = 'cssp-sidebar-collapsed';
+      let collapsed = localStorage.getItem(STORAGE_KEY) === 'true';
+
+      const SIDEBAR_WIDTH = 250;
+
+      function apply(animate = true) {
+        if (!animate) {
+          sidebar.style.transition = 'none';
+        }
+        if (collapsed) {
+          sidebar.style.marginLeft = `-${SIDEBAR_WIDTH}px`;
+          btn.textContent = '▶';
+          btn.style.opacity = '0.5';
+        } else {
+          sidebar.style.marginLeft = '0';
+          btn.textContent = '◀';
+          btn.style.opacity = '1';
+        }
+        if (!animate) {
+          sidebar.offsetHeight; // force reflow
+          sidebar.style.transition = '';
+        }
+      }
+
+      // Apply saved state without animation to avoid flash
+      apply(false);
+
+      btn.addEventListener('click', () => {
+        collapsed = !collapsed;
+        localStorage.setItem(STORAGE_KEY, String(collapsed));
+        apply();
+      });
+    </script>
   </body>
 </html>
