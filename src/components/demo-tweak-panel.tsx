@@ -12,7 +12,7 @@ import { hexToHsl, hslToHex, hslToCssString } from "../lib/color-convert";
 import HslPicker from "./hsl-picker";
 import { useDraggable } from "../hooks/use-draggable";
 
-type Tab = "color" | "typography" | "spacing";
+type Tab = "color" | "typography" | "spacing" | "etc";
 
 interface DemoTweakState {
   colors: Record<string, string>;
@@ -153,6 +153,7 @@ export default function DemoTweakPanel() {
     { key: "color", label: "Color" },
     { key: "typography", label: "Typography" },
     { key: "spacing", label: "Spacing" },
+    { key: "etc", label: "Etc" },
   ];
 
   const sectionHeaderStyle: React.CSSProperties = {
@@ -449,6 +450,11 @@ export default function DemoTweakPanel() {
           {tab === "spacing" &&
             getSliderGroups()
               .filter((g) => g.id === "spacing" || g.id === "decoration")
+              .map(renderSliderGroup)}
+
+          {tab === "etc" &&
+            getSliderGroups()
+              .filter((g) => g.id === "etc")
               .map(renderSliderGroup)}
 
           {/* Reset button */}
